@@ -1,4 +1,4 @@
-import { UserDataToken } from "@common/user/user.interface";
+import { IUserDataToken } from "@common/user/user.interface";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN, REFETCH_TOKEN } from "./enviroment";
 export interface IToken {
@@ -7,7 +7,7 @@ export interface IToken {
 }
 
 export class Token{
-    public static genderToken = async (payload: UserDataToken) : Promise<IToken> => {
+    public static genderToken = async (payload: IUserDataToken) : Promise<IToken> => {
         const accessToken = await jwt.sign(payload, ACCESS_TOKEN, {
             expiresIn: "30s"
         });

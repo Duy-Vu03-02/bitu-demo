@@ -1,3 +1,3 @@
-export interface UserDataToken{
+export interface IUserDataToken{
     id: string
 }
