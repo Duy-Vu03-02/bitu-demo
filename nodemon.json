@@ -1,0 +1,10 @@
+{
+    "delay": "0",
+    "ignore": ["node_modules/*", "dist/*"],
+    "watch": ["src"],
+    "ext": ".ts,.js",
+    "execMap": {
+        "ts": "node -r ts-node/register -r tsconfig-paths/register"
+    }
+        
+}
