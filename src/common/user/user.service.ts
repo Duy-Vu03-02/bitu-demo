@@ -2,7 +2,7 @@ import { IUserResponse, IUserLogin, IUserRegister } from './user.interface';
 import { UserModel } from './user.model';
 
 export class UserService {
-    public static login = async (data: IUserLogin) => {
+    public static login = async (data: IUserLogin) : Promise<IUserResponse> => {
         try {
             const { phone, password } = data;
             if (phone && password) {

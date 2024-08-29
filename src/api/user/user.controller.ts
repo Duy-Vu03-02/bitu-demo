@@ -11,17 +11,16 @@ export class UserController {
     public static login = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = await UserService.login(req.body as IUserLogin);
-            console.log(user)
-            // if (user) {
-            //     const { accessToken, refetchToken } = await Token.genderToken(user as IUserDataToken);
-            //     res.cookie('accessToken', accessToken, {
-            //         maxAge: 1000 * 30,
-            //     });
-            //     res.cookie('refetchToken', refetchToken, {
-            //         maxAge: 1000 * 60 * 60 * 24 * 30,
-            //     });
-            //     res.status(statusCode.OK).json(user);
-            // }
+            if (user) {
+                const { accessToken, refetchToken } = await Token.genderToken(user as IUserDataToken);
+                res.cookie('accessToken', accessToken, {
+                    maxAge: 1000 * 30,
+                });
+                res.cookie('refetchToken', refetchToken, {
+                    maxAge: 1000 * 60 * 60 * 24 * 30,
+                });
+                res.status(statusCode.OK).json(user);
+            }
         } catch (err) {
             console.error(err);
         }
