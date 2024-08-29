@@ -1,38 +1,37 @@
-import { IUserData, IUserLogin, IUserRegister } from "./user.model";
-import { UserModel } from "./user.model";
-import { Token } from "@config/token";
+import { IUserResponse, IUserLogin, IUserRegister } from './user.interface';
+import { UserModel } from './user.model';
 
-export class UserService{
-    public static login = async(data: IUserLogin) => {
-        try{
-            const {phone, password} = data;
-            if(phone && password){
-                const user = await UserModel.findOne({phone, password}).select("password");
-    
-                if(user){
-                    return user;
+export class UserService {
+    public static login = async (data: IUserLogin) => {
+        try {
+            const { phone, password } = data;
+            if (phone && password) {
+                const user = await UserModel.findOne({ phone, password });
+
+                if (user) {
+                    return user.toJSON();
                 }
             }
             return;
-        }
-        catch(err){
+        } catch (err) {
             console.error(err);
         }
-    }
+    };
 
-    public static register = async(data: IUserRegister): Promise<IUserData>  => {
-        try{
-            const {phone, username, password} = data;
-            if(phone && username && password){
+    public static register = async (data: IUserRegister) => {
+        try {
+            const { phone, username, password } = data;
+            if (phone && username && password) {
                 const newUser = await UserModel.create({
-                    phone, username, password
+                    phone,
+                    username,
+                    password,
                 });
                 await newUser.save();
                 return newUser;
             }
-        }
-        catch(err){
+        } catch (err) {
             console.error(err);
         }
-    }
+    };
 }

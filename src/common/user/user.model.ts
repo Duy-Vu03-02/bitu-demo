@@ -1,42 +1,29 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from 'mongoose';
+import { IUserData } from './user.interface';
 
-export interface IUserLogin {
-    phone: string,
-    password: string,
-}
+const UserSchema: Schema<IUserData> = new Schema(
+    {
+        phone: { type: String, required: true },
+        password: { type: String, required: true, select: false },
+        username: { type: String },
+        flight: [
+            {
+                idTickket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
+                state: { type: String },
+            },
+        ],
+    },
+    {
+        timestamps: true,
+        toJSON: {
+            transform: (doc, ret) => {
+                ret.id = ret._id.toHexString();
+                delete ret._id;
+                delete ret.__v;
+                delete ret.password;
+            },
+        },
+    },
+);
 
-export interface IUserRegister{
-    phone: string,
-    password: string,
-    username: string,
-}
-
-export interface IUserData extends Document{
-    _id: Schema.Types.ObjectId,
-    phone: string,
-    password: string,
-    username: string,
-    flight: [{
-        idTickket:  Schema.Types.ObjectId 
-        idSoftLight:  Schema.Types.ObjectId 
-        state:  String
-        confirm:  Boolean
-    }]
-}
-
-const UserSchema = new Schema({
-    phone: {type: String, required: true},
-    password: {type:String, required: true, select: false},
-    username: {type: String},
-    flight: [{
-        idTickket: {type: Schema.Types.ObjectId, ref: "Ticket"},
-        idSoftLight: {type: Schema.Types.ObjectId, ref: "SoftLight"},
-        state: {type: String},
-        confirm: {type: Boolean}
-    }]
-},
-{
-    timestamps: true,
-})
-
-export const UserModel = mongoose.model("UserModel", UserSchema);
+export const UserModel = mongoose.model<IUserData>('User', UserSchema);

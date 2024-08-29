@@ -1,9 +1,16 @@
 import express, { Request, Response } from 'express';
+import userRouter from './user/user.route';
+import ticketRouter from './ticket/ticket.route';
+import bookingRouter from './booking/booking.route';
 
-const routes = express();
+const router = express.Router();
 
-routes.get('/test', (req: Request, res: Response) => {
-    res.sendStatus(200);
+router.get('/test', (req: Request, res: Response) => {
+    return res.status(200).json({ mess: 'ok' });
 });
 
-export default routes;
+router.use('/user', userRouter);
+router.use('/ticket', ticketRouter);
+router.use('/booking', bookingRouter);
+
+export default router;
