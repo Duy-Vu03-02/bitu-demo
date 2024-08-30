@@ -1,4 +1,4 @@
-import { IUserResponse, IUserLogin, IUserRegister } from './user.interface';
+import { IUserResponse, IUserLogin, IUserRegister, ITokenAuthen } from './user.interface';
 import { UserModel } from './user.model';
 
 export class UserService {
@@ -34,4 +34,6 @@ export class UserService {
             console.error(err);
         }
     };
+
+    public static loginByToken = async (data: ITokenAuthen) => {};
 }

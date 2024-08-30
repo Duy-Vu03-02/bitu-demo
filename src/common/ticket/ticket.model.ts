@@ -1,4 +1,3 @@
-import { transform } from 'typescript';
 import { ITicket, ITicketResponse } from './ticket.interface';
 import mongoose, { Schema } from 'mongoose';
 
@@ -22,6 +21,7 @@ const TicketSchema = new Schema(
             transform: (doc, ret) => {
                 ret.id = ret._id;
                 delete ret._id;
+                delete ret.__v;
             },
         },
     },

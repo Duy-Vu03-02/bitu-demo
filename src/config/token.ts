@@ -8,18 +8,21 @@ export interface IToken {
 
 export class Token {
     public static genderToken = async (payload: IUserDataToken): Promise<IToken> => {
-        const accessToken = await jwt.sign(payload, ACCESS_TOKEN, {
-            expiresIn: '30s',
-        });
-        const refetchToken = await jwt.sign(payload, REFETCH_TOKEN, {
-            expiresIn: '30d',
-        });
-        return { accessToken, refetchToken };
+        const { id } = payload;
+        if (id) {
+            const accessToken = await jwt.sign({ id: payload.id }, ACCESS_TOKEN, {
+                expiresIn: '30s',
+            });
+            const refetchToken = await jwt.sign({ id: payload.id }, REFETCH_TOKEN, {
+                expiresIn: '30d',
+            });
+            return { accessToken, refetchToken };
+        }
     };
 
-    public static verifyToken = async (token: string): Promise<Boolean> => {
+    public static verifyToken = async (token: string, secret: string): Promise<Boolean> => {
         try {
-            const verify = await jwt.verify(token);
+            const verify = await jwt.verify(token, secret);
             if (verify) {
                 return true;
             }

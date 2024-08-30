@@ -1,3 +1,4 @@
+import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/token.user';
 import mongoose, { Schema } from 'mongoose';
 
 export interface IUserDataToken extends IUserResponse {
@@ -6,6 +7,11 @@ export interface IUserDataToken extends IUserResponse {
 export interface IUserLogin {
     phone: string;
     password: string;
+}
+
+export interface ITokenAuthen {
+    [ACCESSTOKEN]: string;
+    [REFTECHTOKEN]: string;
 }
 
 export interface IUserRegister {

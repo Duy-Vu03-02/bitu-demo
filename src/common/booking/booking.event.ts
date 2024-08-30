@@ -15,8 +15,9 @@ export class BookingEvent {
     public static handleCreateBooking = async (data: IBooking): Promise<void> => {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
-            await RedisConnect.set(`${idUser}-${idTicket}`, idTicket, 300); // vo van
+            // await RedisConnect.set(`${idUser}-${idTicket}`, idTicket, 300); // vo van
             QueueService.addJob({ idUser, idTicket });
+            QueueService.getQueue(idUser);
         }
     };
 

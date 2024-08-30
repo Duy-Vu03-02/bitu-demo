@@ -10,13 +10,14 @@ export class TicketService {
                 const converTime = new Date(time);
                 const firstTime = new Date(converTime.setHours(0, 0, 0, 0));
                 const lastTime = new Date(converTime.setHours(23, 59, 59, 999));
-                const listTicket: ITicketResponse[] = await TicketModel.find({
+                const listTicket = await TicketModel.find({
                     timeStart: {
                         $gte: firstTime,
                         $lte: lastTime,
                     },
                 });
-                return listTicket;
+
+                return listTicket.map((ticket) => ticket.toJSON());
             }
             return;
         } catch (err) {

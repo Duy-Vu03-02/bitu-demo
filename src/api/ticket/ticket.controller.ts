@@ -6,7 +6,7 @@ import { statusCode } from '@config/errors';
 export class TicketController {
     public static getAllTicket = async (req: Request, res: Response): Promise<void> => {
         try {
-            const listTicket: ITicketResponse[] = await TicketService.getAllTicket(req.body as IGetTicketByTime);
+            const listTicket = await TicketService.getAllTicket(req.body as IGetTicketByTime);
             res.status(statusCode.OK).json(listTicket);
         } catch (err) {
             console.error(err);
@@ -21,6 +21,13 @@ export class TicketController {
             } else {
                 res.status(statusCode.REQUEST_NOT_FOUND);
             }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    public static getTicketByUser = async (req: Request, res: Response): Promise<void> => {
+        try {
         } catch (err) {
             console.error(err);
         }
