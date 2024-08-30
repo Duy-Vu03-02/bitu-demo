@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-export interface IUserDataToken  extends IUserResponse{
+export interface IUserDataToken extends IUserResponse {
     id: string;
 }
 export interface IUserLogin {

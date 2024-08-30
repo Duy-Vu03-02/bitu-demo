@@ -3,13 +3,15 @@ import { ExpressServer } from './server';
 import { DatabaseConnect } from '@common/infrastructure/database';
 import { PORT } from '@config/enviroment';
 import { TicketCron } from '@common/ticket/ticket.cron';
+import { QueueService } from '@common/queue/queue.service';
 
 export class Application {
     public static createApplication = async (): Promise<ExpressServer> => {
         await DatabaseConnect.connectionDB();
 
-        this.registerEvent();
-        this.registerCron();
+        Application.registerEvent();
+        Application.registerCron();
+        Application.registerQueueJob();
 
         const expressServer = new ExpressServer();
         expressServer.setUp(PORT);
@@ -21,7 +23,11 @@ export class Application {
         BookingEvent.register();
     };
 
-    public static registerCron = async () => {
-        await TicketCron.register();
+    public static registerCron = () => {
+        TicketCron.register();
+    };
+
+    public static registerQueueJob = () => {
+        QueueService.register();
     };
 }

@@ -16,7 +16,7 @@ export class ExpressServer {
         this.configMiddleware(server);
         this.useRouter(server);
         this.httpServer = this.listen(server, port);
-
+        this.server = server;
         return this.server;
     };
 
