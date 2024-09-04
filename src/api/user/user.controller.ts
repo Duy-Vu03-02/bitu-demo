@@ -16,7 +16,7 @@ export class UserController {
             if (user) {
                 const { accessToken, refetchToken } = await Token.genderToken(user as IUserDataToken);
                 res.cookie(ACCESSTOKEN, accessToken, {
-                    maxAge: 1000 * 30,
+                    maxAge: 1000 * 60 * 60,
                 });
                 res.cookie(REFTECHTOKEN, refetchToken, {
                     maxAge: 1000 * 60 * 60 * 24 * 30,
@@ -35,7 +35,7 @@ export class UserController {
                 res.status(statusCode.OK).json(newUser);
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
@@ -43,7 +43,7 @@ export class UserController {
         try {
             // await UserService.loginByToken(req.cookies as ITokenAuthen);
             const token = req.cookies[ACCESSTOKEN];
-            if (!token) {
+            if (!token && !req.cookies[REFTECHTOKEN]) {
                 res.status(statusCode.AUTH_ACCOUNT_NOT_FOUND);
             } else {
                 try {
@@ -71,7 +71,7 @@ export class UserController {
                             const payload = JSON.parse(atob(refetchTokenOld.split('.')[1]));
                             const { accessToken, refetchToken } = await Token.genderToken(payload);
                             res.cookie(ACCESSTOKEN, accessToken, {
-                                maxAge: 1000 * 30,
+                                maxAge: 1000 * 60 * 60,
                             });
                             res.cookie(REFTECHTOKEN, refetchToken, {
                                 maxAge: 1000 * 60 * 60 * 24 * 30,

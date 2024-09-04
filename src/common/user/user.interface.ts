@@ -26,7 +26,7 @@ export interface IUserResponse {
     username: string;
     flight: [
         {
-            idTickket: string;
+            idTicket: string;
             idSoftLight: string;
             state: String;
             confirm: Boolean;
@@ -40,7 +40,7 @@ export interface IUserData extends Document {
     username: string;
     flight: [
         {
-            idTickket: Schema.Types.ObjectId;
+            idTicket: Schema.Types.ObjectId;
             idSoftLight: Schema.Types.ObjectId;
             state: string;
             confirm: Boolean;

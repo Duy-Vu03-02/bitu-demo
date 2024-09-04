@@ -3,11 +3,12 @@ import { statusCode } from '@config/errors';
 import { Token } from '@config/token';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN, REFETCH_TOKEN } from '@config/enviroment';
+import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/token.user';
 
 export class AuthMiddleware {
     public static requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const token = req.cookies.accessToken;
-        if (!token) {
+        const token = req.cookies[ACCESSTOKEN];
+        if (!token && !req.cookies[REFTECHTOKEN]) {
             res.status(statusCode.AUTH_ACCOUNT_NOT_FOUND);
         } else {
             try {
@@ -22,7 +23,7 @@ export class AuthMiddleware {
                         const payload = await jwt.decode(refetchTokenOld);
                         const { accessToken, refetchToken } = await Token.genderToken(payload);
                         res.cookie('accessToken', accessToken, {
-                            maxAge: 1000 * 30,
+                            maxAge: 1000 * 60 * 60,
                         });
                         res.cookie('refetchToken', refetchToken, {
                             maxAge: 1000 * 60 * 60 * 24 * 30,

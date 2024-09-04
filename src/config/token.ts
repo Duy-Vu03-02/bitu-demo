@@ -11,7 +11,7 @@ export class Token {
         const { id } = payload;
         if (id) {
             const accessToken = await jwt.sign({ id: payload.id }, ACCESS_TOKEN, {
-                expiresIn: '30s',
+                expiresIn: '1h',
             });
             const refetchToken = await jwt.sign({ id: payload.id }, REFETCH_TOKEN, {
                 expiresIn: '30d',

@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUserData } from './user.interface';
+import { CHUA_XAC_NHAN } from '@common/contstant/state.ticket';
 
 const UserSchema: Schema<IUserData> = new Schema(
     {
@@ -8,8 +9,8 @@ const UserSchema: Schema<IUserData> = new Schema(
         username: { type: String },
         flight: [
             {
-                idTickket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-                state: { type: String },
+                idTicket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
+                state: { type: String, default: CHUA_XAC_NHAN },
             },
         ],
     },
