@@ -9,7 +9,7 @@ export class BookingEvent {
         eventbus.on(CREATE_BOOKING, BookingEvent.handleCreateBooking);
         eventbus.on(CONFIRM_BOOKING, BookingEvent.handleConfirmBooking);
         eventbus.on(CANCEL_BOOKING, BookingEvent.handleCancelBooking);
-        eventbus.on(DEL_BOOKING, BookingEvent.handleDelBookingRedis)
+        eventbus.on(DEL_BOOKING, BookingEvent.handleDelBookingRedis);
     };
 
     public static handleCreateBooking = async (data: IBooking): Promise<void> => {
@@ -36,7 +36,7 @@ export class BookingEvent {
         }
     };
 
-    public static handleDelBookingRedis = async(data: IBooking): Promise<void> => {
+    public static handleDelBookingRedis = async (data: IBooking): Promise<void> => {
         await QueueService.delBooking(data as IBooking);
-    }
+    };
 }

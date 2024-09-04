@@ -1,3 +1,4 @@
+import { QueueOptions } from 'bull';
 import { REDIS_URL } from './../../config/enviroment';
 import IORedis, { Redis } from 'ioredis';
 

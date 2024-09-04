@@ -3,7 +3,6 @@ import BullQueue, { Job } from 'bull';
 import { IBooking, IBookingIdUser, ICancelBooking, IConfirmBooking } from '@common/booking/booking.interface';
 import { BookingService } from '@common/booking/booking.service';
 
-
 export class QueueService {
     private static queue: Queue.Queue<IBooking>;
     private static delayJOb: number = 5 * 1000;
@@ -17,15 +16,15 @@ export class QueueService {
         });
         QueueService.queue = queue;
 
-        queue.on("completed", (job)=>{
-            console.log(job.data)
-        })
+        queue.on('completed', (job) => {
+            console.log(job.data);
+        });
     };
 
     public static addJob = async (job: IBooking): Promise<void> => {
-        const checkJob =await QueueService.queue.getJob(QueueService.genderIdJob(job as IBooking))
-        if(!checkJob && !checkJob?.data){
-            console.log("add job: ", QueueService.delayJOb);
+        const checkJob = await QueueService.queue.getJob(QueueService.genderIdJob(job as IBooking));
+        if (!checkJob && !checkJob?.data) {
+            console.log('add job: ', QueueService.delayJOb);
             await QueueService.queue.add(job, {
                 delay: QueueService.delayJOb,
                 jobId: QueueService.genderIdJob(job),
@@ -66,10 +65,10 @@ export class QueueService {
         return listJobs;
     };
 
-    public static delBooking = async(job: IBooking) : Promise<void> => {
+    public static delBooking = async (job: IBooking): Promise<void> => {
         const currentJob = await QueueService.queue.getJob(QueueService.genderIdJob(job));
-        if(currentJob){
+        if (currentJob) {
             await currentJob.remove();
         }
-    }
+    };
 }

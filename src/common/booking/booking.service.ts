@@ -40,7 +40,7 @@ export class BookingService {
                 });
             }
 
-            eventbus.emit(DEL_BOOKING, {idUser, idTicket})
+            eventbus.emit(DEL_BOOKING, { idUser, idTicket });
             eventbus.emit(AUTOMATIC_REDUCTION, { idUser, idTicket });
         } catch (err) {
             console.error(err);
@@ -62,7 +62,7 @@ export class BookingService {
                         },
                     },
                 );
-                eventbus.emit(DEL_BOOKING, {idUser, idTicket})
+                eventbus.emit(DEL_BOOKING, { idUser, idTicket });
                 eventbus.emit(AUTOMATIC_INCREASE, { idUser, idTicket });
             }
         } catch (err) {
@@ -87,9 +87,9 @@ export class BookingService {
                             ...item.idTicket,
                             payment: false,
                             cancel: item.state === DA_THANH_TOAN ? true : false,
-                        }
-                    })
-                )
+                        };
+                    }),
+                );
                 console.log(listTicket);
                 const listSoft = await QueueService.getJobByIdUser(data as IBookingIdUser);
                 const listSoftId = await Promise.all(listSoft.map((item) => item.idTicket));
