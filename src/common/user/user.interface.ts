@@ -36,6 +36,7 @@ export interface IUserResponse {
 export interface IUserData extends Document {
     _id: Schema.Types.ObjectId;
     phone: string;
+    email: string;
     password: string;
     username: string;
     flight: [

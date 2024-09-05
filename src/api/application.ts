@@ -4,6 +4,8 @@ import { DatabaseConnect } from '@common/infrastructure/database';
 import { PORT } from '@config/enviroment';
 import { TicketCron } from '@common/ticket/ticket.cron';
 import { QueueService } from '@common/queue/queue.service';
+import { TickerEvent } from '@common/ticket/event.ticket';
+import { BookingSendMail } from '@common/booking/booking.email-job';
 
 export class Application {
     public static createApplication = async (): Promise<ExpressServer> => {
@@ -11,7 +13,6 @@ export class Application {
 
         Application.registerEvent();
         Application.registerCron();
-        Application.registerQueueJob();
 
         const expressServer = new ExpressServer();
         expressServer.setUp(PORT);
@@ -21,13 +22,11 @@ export class Application {
 
     public static registerEvent = () => {
         BookingEvent.register();
+        TickerEvent.register();
+        BookingSendMail.register();
     };
 
     public static registerCron = () => {
         TicketCron.register();
-    };
-
-    public static registerQueueJob = () => {
-        QueueService.register();
     };
 }

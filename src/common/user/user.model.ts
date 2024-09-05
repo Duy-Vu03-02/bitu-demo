@@ -7,6 +7,7 @@ const UserSchema: Schema<IUserData> = new Schema(
         phone: { type: String, required: true },
         password: { type: String, required: true, select: false },
         username: { type: String },
+        email: { type: String },
         flight: [
             {
                 idTicket: { type: Schema.Types.ObjectId, ref: 'Ticket' },

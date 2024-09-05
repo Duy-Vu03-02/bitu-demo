@@ -25,11 +25,4 @@ export class TicketController {
             console.error(err);
         }
     };
-
-    public static getTicketByUser = async (req: Request, res: Response): Promise<void> => {
-        try {
-        } catch (err) {
-            console.error(err);
-        }
-    };
 }

@@ -5,6 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
+    "dev-worker": "nodemon src/index-worker.ts",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "author": "",
@@ -19,6 +20,7 @@
     "@types/ioredis": "^4.28.10",
     "@types/mongoose": "^5.11.96",
     "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.15",
     "body-parser": "^1.20.2",
     "bull": "^4.16.1",
     "cookie-parser": "^1.4.6",
@@ -30,8 +32,10 @@
     "helmet": "^7.1.0",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
+    "mailersend": "^2.3.0",
     "mongoose": "^8.5.4",
     "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.15",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",

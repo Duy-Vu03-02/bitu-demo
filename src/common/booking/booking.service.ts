@@ -1,8 +1,9 @@
+import { Queue } from 'bull';
 import { CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
 import {
-    IAllBookingUser,
     IBooking,
     IBookingIdUser,
+    IBookingSendMai,
     ICancelBooking,
     IConfirmBooking,
     IResponseBookingUser,
@@ -11,8 +12,10 @@ import eventbus from '@common/eventbus';
 import { UserModel } from '@common/user/user.model';
 import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/state.ticket';
 import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/event.ticket';
-import { QueueService } from '@common/queue/queue.service';
 import { TicketModel } from '@common/ticket/ticket.model';
+import { BookingJob } from '@worker/booking/booking.job';
+import { BookingSendMail } from './booking.email-job';
+import { SEND_MAIL } from '@common/contstant/event.mailer';
 
 export class BookingService {
     public static bookingTicket = async (data: IBooking): Promise<void> => {
@@ -30,7 +33,7 @@ export class BookingService {
         try {
             const { idUser, idTicket } = data;
             if (idUser && idTicket) {
-                await UserModel.findByIdAndUpdate(idUser, {
+                const user = await UserModel.findByIdAndUpdate(idUser, {
                     $push: {
                         flight: {
                             idTicket,
@@ -38,10 +41,12 @@ export class BookingService {
                         },
                     },
                 });
+                if (user.email) {
+                    eventbus.emit(SEND_MAIL, { email: user.email });
+                }
+                eventbus.emit(DEL_BOOKING, { idUser, idTicket });
+                eventbus.emit(AUTOMATIC_REDUCTION, { idUser, idTicket });
             }
-
-            eventbus.emit(DEL_BOOKING, { idUser, idTicket });
-            eventbus.emit(AUTOMATIC_REDUCTION, { idUser, idTicket });
         } catch (err) {
             console.error(err);
         }
@@ -51,7 +56,7 @@ export class BookingService {
         try {
             const { idUser, idTicket } = data;
             if (idUser && idTicket) {
-                await UserModel.findOne(
+                await UserModel.findOneAndUpdate(
                     {
                         _id: idUser,
                         'flight.idTicket': idTicket,
@@ -62,9 +67,9 @@ export class BookingService {
                         },
                     },
                 );
-                eventbus.emit(DEL_BOOKING, { idUser, idTicket });
                 eventbus.emit(AUTOMATIC_INCREASE, { idUser, idTicket });
             }
+            eventbus.emit(DEL_BOOKING, { idUser, idTicket });
         } catch (err) {
             console.error(err);
         }
@@ -74,24 +79,37 @@ export class BookingService {
         try {
             const { idUser } = data;
             if (idUser) {
-                const user = await UserModel.findById(idUser).populate({
-                    path: 'flight',
-                    populate: {
-                        path: 'idTicket',
-                    },
-                });
-                const listTicket = await Promise.all(
-                    user.flight.map((item) => {
-                        return {
-                            state: item.state,
-                            ...item.idTicket,
-                            payment: false,
-                            cancel: item.state === DA_THANH_TOAN ? true : false,
-                        };
-                    }),
-                );
-                console.log(listTicket);
-                const listSoft = await QueueService.getJobByIdUser(data as IBookingIdUser);
+                let user = await UserModel.findById(idUser)
+                    .populate({
+                        path: 'flight',
+                        populate: {
+                            path: 'idTicket',
+                        },
+                    })
+                    .lean();
+
+                const listTicket =
+                    user.flight.length < 0
+                        ? []
+                        : await Promise.all(
+                              user.flight.map((item) => {
+                                  let ticket = Object.assign({}, item.idTicket);
+                                  if (ticket) {
+                                      return {
+                                          ...ticket['_doc'],
+                                          id: ticket['_doc']['_id'].toHexString(),
+                                          state: item.state,
+                                          payment: false,
+                                          cancel: item.state === DA_THANH_TOAN,
+                                      };
+                                  }
+                              }),
+                          );
+                const listSoft = await BookingJob.getJobByIdUser(data as IBookingIdUser);
+
+                if (listSoft.length <= 0) {
+                    return listTicket;
+                }
                 const listSoftId = await Promise.all(listSoft.map((item) => item.idTicket));
                 const listSoftBooking: IResponseBookingUser[] = await Promise.all(
                     listSoftId.map(async (item) => {
@@ -103,7 +121,7 @@ export class BookingService {
                         };
                     }),
                 );
-                return listSoftBooking;
+                return [...listSoftBooking, ...listTicket];
             }
         } catch (err) {
             console.error(err);

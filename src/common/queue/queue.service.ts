@@ -9,12 +9,15 @@ export class QueueService {
         if (!queue) {
             queue = new Queue(jobName, {
                 redis: {
-                    host: "127.0.0.1",
+                    host: '127.0.0.1',
                     port: 6379,
-                }
+                },
             });
 
-            queue.on("error", (error) => console.error(error));
+            // Lang nghe process moi autoremove dc
+            // queue.process((job) => {});
+
+            queue.on('error', (error) => console.error(error));
             QueueService.queues.set(jobName, queue);
         }
 

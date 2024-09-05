@@ -17,11 +17,16 @@ export interface IBookingIdUser {
     idUser: string;
 }
 
+export interface IBookingSendMai {
+    email: string;
+}
+
 export interface IAllBookingUser {
     id: string;
 }
 
 export interface IResponseBookingUser {
+    _id: string;
     timeStart: Date;
     from: {
         idLocation: string;
@@ -35,4 +40,6 @@ export interface IResponseBookingUser {
     price: Number;
     id: string;
     state: string;
+    payment: boolean;
+    cancel: boolean;
 }

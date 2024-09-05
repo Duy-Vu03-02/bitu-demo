@@ -15,7 +15,7 @@ export class BookingController {
             await BookingService.bookingTicket(req.body as IBooking);
             res.status(statusCode.OK);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
@@ -24,7 +24,7 @@ export class BookingController {
             await BookingService.confirmBooking(req.body as IConfirmBooking);
             res.status(statusCode.OK);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 

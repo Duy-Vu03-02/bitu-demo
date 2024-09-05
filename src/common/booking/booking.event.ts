@@ -2,7 +2,7 @@ import { Queue, Job } from 'bull';
 import { CANCEL_BOOKING, CONFIRM_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
 import eventbus from '@common/eventbus';
 import { IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
-import { QueueService } from '@common/queue/queue.service';
+import { BookingJob } from '@worker/booking/booking.job';
 
 export class BookingEvent {
     public static register = (): void => {
@@ -16,7 +16,7 @@ export class BookingEvent {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             // await RedisConnect.set(`${idUser}-${idTicket}`, idTicket, 300); // vo van
-            await QueueService.addJob({ idUser, idTicket });
+            await BookingJob.addJob({ idUser, idTicket });
         }
     };
 
@@ -24,7 +24,7 @@ export class BookingEvent {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             // await RedisConnect.del(`${idUser}-${idTicket}`);
-            await QueueService.cancelJob(data as ICancelBooking);
+            await BookingJob.delBooking(data as ICancelBooking);
         }
     };
 
@@ -32,11 +32,11 @@ export class BookingEvent {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             // await RedisConnect.del(`${idUser}-${idTicket}`);
-            await QueueService.confirmJob(data as IConfirmBooking);
+            await BookingJob.delBooking(data as IConfirmBooking);
         }
     };
 
     public static handleDelBookingRedis = async (data: IBooking): Promise<void> => {
-        await QueueService.delBooking(data as IBooking);
+        await BookingJob.delBooking(data as IBooking);
     };
 }
