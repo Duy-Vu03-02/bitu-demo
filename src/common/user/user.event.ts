@@ -27,6 +27,7 @@ export class UserEvent {
                     attempts: 3,
                     backoff: 1000,
                     removeOnFail: true,
+                    // lifetime: 1000 * 60 *5,
             }
         )
     }
