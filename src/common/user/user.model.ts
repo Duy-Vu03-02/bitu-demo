@@ -8,12 +8,7 @@ const UserSchema: Schema<IUserData> = new Schema(
         password: { type: String, required: true, select: false },
         username: { type: String },
         email: { type: String },
-        flight: [
-            {
-                idTicket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-                state: { type: String, default: CHUA_XAC_NHAN },
-            },
-        ],
+        flight: { type: Schema.Types.ObjectId, ref: 'UserBooking' },
     },
     {
         timestamps: true,

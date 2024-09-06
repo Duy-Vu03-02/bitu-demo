@@ -33,7 +33,7 @@ export class BookingController {
             await BookingService.cancelBooking(req.body as ICancelBooking);
             res.status(statusCode.OK);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 

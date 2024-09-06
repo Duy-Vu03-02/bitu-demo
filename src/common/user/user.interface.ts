@@ -18,20 +18,14 @@ export interface IUserRegister {
     phone: string;
     password: string;
     username: string;
+    email: string;
 }
 
 export interface IUserResponse {
     id: string;
     phone: string;
     username: string;
-    flight: [
-        {
-            idTicket: string;
-            idSoftLight: string;
-            state: String;
-            confirm: Boolean;
-        },
-    ];
+    flight: string;
 }
 export interface IUserData extends Document {
     _id: Schema.Types.ObjectId;
@@ -39,12 +33,21 @@ export interface IUserData extends Document {
     email: string;
     password: string;
     username: string;
-    flight: [
-        {
-            idTicket: Schema.Types.ObjectId;
-            idSoftLight: Schema.Types.ObjectId;
-            state: string;
-            confirm: Boolean;
-        },
-    ];
+    flight: Schema.Types.ObjectId;
+}
+
+export interface IUserForgorPassword {
+    email: string;
+    ip: string;
+    otp?: string;
+}
+
+export interface IUserOTP{
+    otp: string;
+    email?: string;
+    ip: string;
+}
+
+export interface IUserResponseOTP{
+    
 }

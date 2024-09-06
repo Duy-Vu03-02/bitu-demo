@@ -1,6 +1,5 @@
-import { jwt } from 'jsonwebtoken';
 import { UserModel } from '@common/user/user.model';
-import { IUserRegister, IUserLogin, ITokenAuthen } from '@common/user/user.interface';
+import { IUserRegister, IUserLogin, IUserForgorPassword, IUserOTP } from '@common/user/user.interface';
 import { UserService } from '@common/user/user.service';
 import { Response, Request } from 'express';
 import { Token } from '@config/token';
@@ -32,6 +31,13 @@ export class UserController {
         try {
             const newUser = await UserService.register(req.body as IUserRegister);
             if (newUser) {
+                const { accessToken, refetchToken } = await Token.genderToken(newUser.toJSON() as IUserDataToken);
+                res.cookie(ACCESSTOKEN, accessToken, {
+                    maxAge: 1000 * 60 * 60,
+                });
+                res.cookie(REFTECHTOKEN, refetchToken, {
+                    maxAge: 1000 * 60 * 60 * 24 * 30,
+                });
                 res.status(statusCode.OK).json(newUser);
             }
         } catch (err) {
@@ -116,4 +122,47 @@ export class UserController {
             console.error(err);
         }
     };
+
+    public static forgotPassword = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const checkUser = await UserService.forgotPassword({
+                ...req.body,
+                ip: req.socket.remoteAddress,
+            } as IUserForgorPassword);
+            if (checkUser) {
+                res.status(statusCode.OK).json({ messgae: 'Xac nhan thanh cong vui long check EMAIL' });
+            }
+            else{
+                res.status(statusCode.AUTH_ACCOUNT_NOT_FOUND);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    public static verifyOTP = async(req: Request, res: Response): Promise<void> => {
+        try{
+            const userOTP = await UserService.verifyOTP({
+                ip: req.socket.remoteAddress,
+                ...req.body
+            } as IUserOTP);
+
+            if(userOTP){
+                const { accessToken, refetchToken } = await Token.genderToken(userOTP as IUserDataToken);
+                res.cookie(ACCESSTOKEN, accessToken, {
+                    maxAge: 1000 * 60 * 60,
+                });
+                res.cookie(REFTECHTOKEN, refetchToken, {
+                    maxAge: 1000 * 60 * 60 * 24 * 30,
+                });
+                res.status(statusCode.OK).json(userOTP);
+            }
+            else{
+                res.sendStatus(statusCode.AUTH_ACCOUNT_NOT_FOUND);
+            }
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
 }

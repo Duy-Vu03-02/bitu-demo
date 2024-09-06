@@ -17,10 +17,6 @@ export interface IBookingIdUser {
     idUser: string;
 }
 
-export interface IBookingSendMai {
-    email: string;
-}
-
 export interface IAllBookingUser {
     id: string;
 }
@@ -42,4 +38,18 @@ export interface IResponseBookingUser {
     state: string;
     payment: boolean;
     cancel: boolean;
+}
+
+export interface IConfirmSendMail {
+    email: string;
+    timeStart: Date;
+    from: string;
+    to: string;
+}
+
+export interface IAddIdUserBooking {
+    idUserBooking: string;
+    idUser: string;
+    timeStart: string;
+    idTicket: string;
 }

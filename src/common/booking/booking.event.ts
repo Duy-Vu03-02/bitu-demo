@@ -1,8 +1,17 @@
 import { Queue, Job } from 'bull';
-import { CANCEL_BOOKING, CONFIRM_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
+import {
+    ADD_ID_BOOKING,
+    CANCEL_BOOKING,
+    CONFIRM_BOOKING,
+    CREATE_BOOKING,
+    DEL_BOOKING,
+} from '@common/contstant/event.booking';
 import eventbus from '@common/eventbus';
-import { IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
+import { IAddIdUserBooking, IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
 import { BookingJob } from '@worker/booking/booking.job';
+import { UserModel } from '@common/user/user.model';
+import { SEND_MAIL } from '@common/contstant/event.mailer';
+import { TicketModel } from '@common/ticket/ticket.model';
 
 export class BookingEvent {
     public static register = (): void => {
@@ -10,6 +19,7 @@ export class BookingEvent {
         eventbus.on(CONFIRM_BOOKING, BookingEvent.handleConfirmBooking);
         eventbus.on(CANCEL_BOOKING, BookingEvent.handleCancelBooking);
         eventbus.on(DEL_BOOKING, BookingEvent.handleDelBookingRedis);
+        eventbus.on(ADD_ID_BOOKING, BookingEvent.handleAddIdBooking);
     };
 
     public static handleCreateBooking = async (data: IBooking): Promise<void> => {
@@ -38,5 +48,22 @@ export class BookingEvent {
 
     public static handleDelBookingRedis = async (data: IBooking): Promise<void> => {
         await BookingJob.delBooking(data as IBooking);
+    };
+
+    public static handleAddIdBooking = async (data: IAddIdUserBooking): Promise<void> => {
+        const user = await UserModel.findByIdAndUpdate(data.idUser, {
+            flight: data.idUserBooking,
+        });
+        if (user.email) {
+            const ticket = await TicketModel.findById(data.idTicket);
+            if (ticket) {
+                eventbus.emit(SEND_MAIL, {
+                    email: user.email,
+                    from: ticket.from.name,
+                    to: ticket.to.name,
+                    timeStart: ticket.timeStart,
+                });
+            }
+        }
     };
 }

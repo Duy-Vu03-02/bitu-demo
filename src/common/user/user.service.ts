@@ -1,5 +1,10 @@
-import { IUserResponse, IUserLogin, IUserRegister, ITokenAuthen } from './user.interface';
+import { Queue } from 'bull';
+import eventbus from '@common/eventbus';
+import { IUserResponse, IUserLogin, IUserRegister, ITokenAuthen, IUserForgorPassword, IUserOTP } from './user.interface';
 import { UserModel } from './user.model';
+import { FORGOT_PASSWORD } from '@common/contstant/event.user';
+import { QueueService } from '@common/queue/queue.service';
+import { JOB_FORGOT_PASSWORD } from '@config/job';
 
 export class UserService {
     public static login = async (data: IUserLogin): Promise<IUserResponse> => {
@@ -20,12 +25,13 @@ export class UserService {
 
     public static register = async (data: IUserRegister) => {
         try {
-            const { phone, username, password } = data;
+            const { phone, username, password, email } = data;
             if (phone && username && password) {
                 const newUser = await UserModel.create({
                     phone,
                     username,
                     password,
+                    email,
                 });
                 await newUser.save();
                 return newUser;
@@ -36,4 +42,40 @@ export class UserService {
     };
 
     public static loginByToken = async (data: ITokenAuthen) => {};
+
+    public static forgotPassword = async (data: IUserForgorPassword): Promise<boolean> => {
+        try {
+            const user = await UserModel.findOne({ email: data.email });
+            if (user) {
+                eventbus.emit(FORGOT_PASSWORD, { email: user.email, ip: data.ip } as IUserForgorPassword);
+                return true;
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    public static verifyOTP = async(data: IUserOTP) : Promise<unknown> => {
+        try{
+            const {otp, email, ip} = data;
+            if(otp && ip && email){
+                const queue = await QueueService.getQueue(JOB_FORGOT_PASSWORD);
+                const idJob = email + "-" + ip;
+                const job = await queue.getJob(idJob);
+
+                if(job && job.data ){
+                    if(job.data.otp === otp){
+                        const user =  (await UserModel.findOne({email})).toJSON();
+                        if(user){
+                            return user;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
 }

@@ -11,3 +11,5 @@ export const MONGODB_URL: string = process.env.MONGODB_URI;
 export const ACCESS_TOKEN: string = process.env.ACCESS_TOKEN;
 export const REFETCH_TOKEN: string = process.env.REFETCH_TOKEN;
 export const REDIS_URL: string = process.env.REDIS_URI;
+export const EMAIL_ACCOUNT: string = process.env.MAILER_ACCOUNT;
+export const EMAIL_PASSWORD: string = process.env.MAILER_PASSWORD;

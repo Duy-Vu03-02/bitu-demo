@@ -6,6 +6,7 @@ import { TicketCron } from '@common/ticket/ticket.cron';
 import { QueueService } from '@common/queue/queue.service';
 import { TickerEvent } from '@common/ticket/event.ticket';
 import { BookingSendMail } from '@common/booking/booking.email-job';
+import { UserEvent } from '@common/user/user.event';
 
 export class Application {
     public static createApplication = async (): Promise<ExpressServer> => {
@@ -24,6 +25,7 @@ export class Application {
         BookingEvent.register();
         TickerEvent.register();
         BookingSendMail.register();
+        UserEvent.register();
     };
 
     public static registerCron = () => {

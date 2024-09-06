@@ -1,11 +1,10 @@
-import { Queue } from 'bull';
-import { CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
+import { ADD_ID_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
 import {
     IBooking,
     IBookingIdUser,
-    IBookingSendMai,
     ICancelBooking,
     IConfirmBooking,
+    IConfirmSendMail,
     IResponseBookingUser,
 } from './booking.interface';
 import eventbus from '@common/eventbus';
@@ -14,8 +13,8 @@ import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/state.ti
 import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/event.ticket';
 import { TicketModel } from '@common/ticket/ticket.model';
 import { BookingJob } from '@worker/booking/booking.job';
-import { BookingSendMail } from './booking.email-job';
-import { SEND_MAIL } from '@common/contstant/event.mailer';
+import { UserBookingModel } from '@common/userBooking/userBooking.model';
+import { IUserBooking } from '@common/userBooking/userBooking.interface';
 
 export class BookingService {
     public static bookingTicket = async (data: IBooking): Promise<void> => {
@@ -33,17 +32,21 @@ export class BookingService {
         try {
             const { idUser, idTicket } = data;
             if (idUser && idTicket) {
-                const user = await UserModel.findByIdAndUpdate(idUser, {
-                    $push: {
-                        flight: {
+                const newUserBooking: IUserBooking = await UserBookingModel.create({
+                    idUser,
+                    tickets: [
+                        {
                             idTicket,
                             state: DA_THANH_TOAN,
                         },
-                    },
+                    ],
                 });
-                if (user.email) {
-                    eventbus.emit(SEND_MAIL, { email: user.email });
-                }
+
+                eventbus.emit(ADD_ID_BOOKING, {
+                    idUserBooking: newUserBooking._id,
+                    idUser: idUser,
+                    idTicket,
+                });
                 eventbus.emit(DEL_BOOKING, { idUser, idTicket });
                 eventbus.emit(AUTOMATIC_REDUCTION, { idUser, idTicket });
             }
@@ -79,34 +82,39 @@ export class BookingService {
         try {
             const { idUser } = data;
             if (idUser) {
-                let user = await UserModel.findById(idUser)
-                    .populate({
-                        path: 'flight',
-                        populate: {
-                            path: 'idTicket',
-                        },
-                    })
-                    .lean();
+                const user = await UserModel.findById(idUser);
+                let listTicket: any[];
+                if (user && user?.flight) {
+                    const flight = await UserBookingModel.findOne({ idUser: user._id })
+                        .populate({
+                            path: 'tickets',
+                            populate: {
+                                path: 'idTicket',
+                            },
+                        })
+                        .lean();
 
-                const listTicket =
-                    user.flight.length < 0
-                        ? []
-                        : await Promise.all(
-                              user.flight.map((item) => {
-                                  let ticket = Object.assign({}, item.idTicket);
-                                  if (ticket) {
-                                      return {
-                                          ...ticket['_doc'],
-                                          id: ticket['_doc']['_id'].toHexString(),
-                                          state: item.state,
-                                          payment: false,
-                                          cancel: item.state === DA_THANH_TOAN,
-                                      };
-                                  }
-                              }),
-                          );
+                    if (flight && flight?.tickets?.length > 0) {
+                        const listFlights = flight.tickets;
+                        listTicket = await Promise.all(
+                            listFlights.map((item) => {
+                                let ticket = Object.assign({}, item.idTicket);
+                                if (ticket) {
+                                    return {
+                                        ...ticket['_doc'],
+                                        id: ticket['_doc']['_id'].toHexString(),
+                                        state: item.state,
+                                        payment: false,
+                                        cancel: item.state === DA_THANH_TOAN,
+                                    };
+                                }
+                            }),
+                        );
+                    }
+                }
+
+                // Get trong redis
                 const listSoft = await BookingJob.getJobByIdUser(data as IBookingIdUser);
-
                 if (listSoft.length <= 0) {
                     return listTicket;
                 }
@@ -121,7 +129,7 @@ export class BookingService {
                         };
                     }),
                 );
-                return [...listSoftBooking, ...listTicket];
+                return [...listSoftBooking,...listTicket];
             }
         } catch (err) {
             console.error(err);
