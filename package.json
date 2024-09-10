@@ -6,7 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
     "dev-worker": "nodemon src/index-worker.ts",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "build": "npm run clean && tsc && tscpaths -p tsconfig.json -s ./src -o ./dist",
+    "clean": "rimraf dist"
   },
   "author": "",
   "license": "ISC",
@@ -38,9 +40,12 @@
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "devDependencies": {
     "tscpaths": "^0.0.9",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   }
 }

@@ -2,15 +2,15 @@ import { QueueOptions } from 'bull';
 import { REDIS_URL } from './../../config/enviroment';
 import IORedis, { Redis } from 'ioredis';
 
-export class RedisConnect {
+export class RedisAdapter {
     private static client: Redis;
     private static allClients: Redis[] = [];
 
     public static getClient = async (): Promise<Redis> => {
-        if (!RedisConnect.client) {
-            await RedisConnect.connect();
+        if (!RedisAdapter.client) {
+            await RedisAdapter.connect();
         }
-        return RedisConnect.client;
+        return RedisAdapter.client;
     };
 
     public static connect = async (overrideClient = true): Promise<Redis> => {
@@ -37,12 +37,20 @@ export class RedisConnect {
         });
 
         if (!overrideClient) {
-            RedisConnect.client = temp;
+            RedisAdapter.client = temp;
         }
 
-        RedisConnect.allClients.push(temp);
+        RedisAdapter.allClients.push(temp);
 
         return temp;
+    };
+
+    public static disconnect = async (): Promise<void> => {
+        try {
+            await Promise.all(RedisAdapter.allClients.map((client) => client.quit()));
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     public static serialize = (value: unknown): string => {
@@ -60,19 +68,19 @@ export class RedisConnect {
     };
 
     public static get = async (key: string, shoudConver = false): Promise<unknown> => {
-        const value = await (await RedisConnect.getClient()).get(key);
-        return shoudConver ? RedisConnect.deserialize(value) : value;
+        const value = await (await RedisAdapter.getClient()).get(key);
+        return shoudConver ? RedisAdapter.deserialize(value) : value;
     };
 
     public static set = async (key: string, value: unknown, ttl = 0, should = false): Promise<unknown> => {
-        const stringValue = should ? RedisConnect.serialize(value) : (value as string);
+        const stringValue = should ? RedisAdapter.serialize(value) : (value as string);
         if (ttl > 0) {
-            return await (await RedisConnect.getClient()).set(key, stringValue, 'EX', ttl);
+            return await (await RedisAdapter.getClient()).set(key, stringValue, 'EX', ttl);
         }
-        return await (await RedisConnect.getClient()).set(key, stringValue);
+        return await (await RedisAdapter.getClient()).set(key, stringValue);
     };
 
     public static del = async (key: string): Promise<unknown> => {
-        return (await RedisConnect.getClient()).del(key);
+        return (await RedisAdapter.getClient()).del(key);
     };
 }

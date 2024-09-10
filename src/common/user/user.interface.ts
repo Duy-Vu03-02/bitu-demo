@@ -1,4 +1,4 @@
-import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/token.user';
+import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/user.token';
 import mongoose, { Schema } from 'mongoose';
 
 export interface IUserDataToken extends IUserResponse {
@@ -42,12 +42,10 @@ export interface IUserForgorPassword {
     otp?: string;
 }
 
-export interface IUserOTP{
+export interface IUserOTP {
     otp: string;
     email?: string;
     ip: string;
 }
 
-export interface IUserResponseOTP{
-    
-}
+export interface IUserResponseOTP {}

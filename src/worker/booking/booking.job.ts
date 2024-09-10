@@ -10,7 +10,9 @@ export class BookingJob {
 
     public static register = async (): Promise<Queue.Queue> => {
         const currentJob = await QueueService.getQueue(Job_Name);
-        currentJob.process((job: Job, done: DoneCallback) => {done()});
+        currentJob.process((job: Job, done: DoneCallback) => {
+            done();
+        });
         return currentJob;
     };
 

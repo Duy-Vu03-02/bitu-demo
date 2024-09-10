@@ -5,12 +5,12 @@ import {
     CONFIRM_BOOKING,
     CREATE_BOOKING,
     DEL_BOOKING,
-} from '@common/contstant/event.booking';
+} from '@common/contstant/booking.event';
 import eventbus from '@common/eventbus';
 import { IAddIdUserBooking, IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
 import { BookingJob } from '@worker/booking/booking.job';
 import { UserModel } from '@common/user/user.model';
-import { SEND_MAIL } from '@common/contstant/event.mailer';
+import { SEND_MAIL } from '@common/contstant/mailer.event';
 import { TicketModel } from '@common/ticket/ticket.model';
 
 export class BookingEvent {

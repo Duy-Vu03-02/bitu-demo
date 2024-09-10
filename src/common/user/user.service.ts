@@ -1,8 +1,15 @@
 import { Queue } from 'bull';
 import eventbus from '@common/eventbus';
-import { IUserResponse, IUserLogin, IUserRegister, ITokenAuthen, IUserForgorPassword, IUserOTP } from './user.interface';
+import {
+    IUserResponse,
+    IUserLogin,
+    IUserRegister,
+    ITokenAuthen,
+    IUserForgorPassword,
+    IUserOTP,
+} from './user.interface';
 import { UserModel } from './user.model';
-import { FORGOT_PASSWORD } from '@common/contstant/event.user';
+import { FORGOT_PASSWORD } from '@common/contstant/user.event';
 import { QueueService } from '@common/queue/queue.service';
 import { JOB_FORGOT_PASSWORD } from '@config/job';
 
@@ -55,27 +62,26 @@ export class UserService {
         }
     };
 
-    public static verifyOTP = async(data: IUserOTP) : Promise<unknown> => {
-        try{
-            const {otp, email, ip} = data;
-            if(otp && ip && email){
+    public static verifyOTP = async (data: IUserOTP): Promise<unknown> => {
+        try {
+            const { otp, email, ip } = data;
+            if (otp && ip && email) {
                 const queue = await QueueService.getQueue(JOB_FORGOT_PASSWORD);
-                const idJob = email + "-" + ip;
+                const idJob = email + '-' + ip;
                 const job = await queue.getJob(idJob);
 
-                if(job && job.data ){
-                    if(job.data.otp === otp){
-                        const user =  (await UserModel.findOne({email})).toJSON();
-                        if(user){
+                if (job && job.data) {
+                    if (job.data.otp === otp) {
+                        const user = (await UserModel.findOne({ email })).toJSON();
+                        if (user) {
                             return user;
                         }
                     }
                 }
             }
             return false;
-        }
-        catch(err){
+        } catch (err) {
             console.error(err);
         }
-    }
+    };
 }

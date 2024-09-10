@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUserData } from './user.interface';
-import { CHUA_XAC_NHAN } from '@common/contstant/state.ticket';
+import { CHUA_XAC_NHAN } from '@common/contstant/ticket.state';
 
 const UserSchema: Schema<IUserData> = new Schema(
     {

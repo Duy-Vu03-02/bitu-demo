@@ -8,7 +8,7 @@ import { IConfirmSendMail } from '@common/booking/booking.interface';
 export class MailerConfirmBookingJob {
     public static async register(): Promise<Queue<unknown>> {
         const queue = await QueueService.getQueue(Job_Name);
-         queue.process(MailerConfirmBookingJob.handler);
+        queue.process(MailerConfirmBookingJob.handler);
 
         return queue;
     }

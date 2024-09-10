@@ -1,5 +1,5 @@
 import { QueueService } from '@common/queue/queue.service';
-import { SEND_MAIL } from '@common/contstant/event.mailer';
+import { SEND_MAIL } from '@common/contstant/mailer.event';
 import eventbus from '@common/eventbus';
 import { JOB_SEND_MAIL_CONFIRM as Job_Name } from '@config/job';
 import { IConfirmSendMail } from './booking.interface';

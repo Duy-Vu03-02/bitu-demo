@@ -1,4 +1,4 @@
-import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/event.ticket';
+import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/ticket.event';
 import eventbus from '@common/eventbus';
 import { IAutoIncrease, IAutoReduction } from './ticket.interface';
 import { TicketModel } from './ticket.model';

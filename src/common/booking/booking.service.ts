@@ -1,4 +1,4 @@
-import { ADD_ID_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/event.booking';
+import { ADD_ID_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/booking.event';
 import {
     IBooking,
     IBookingIdUser,
@@ -9,8 +9,8 @@ import {
 } from './booking.interface';
 import eventbus from '@common/eventbus';
 import { UserModel } from '@common/user/user.model';
-import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/state.ticket';
-import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/event.ticket';
+import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/ticket.state';
+import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/ticket.event';
 import { TicketModel } from '@common/ticket/ticket.model';
 import { BookingJob } from '@worker/booking/booking.job';
 import { UserBookingModel } from '@common/userBooking/userBooking.model';
@@ -41,6 +41,8 @@ export class BookingService {
                         },
                     ],
                 });
+
+                eventbus.emit()
 
                 eventbus.emit(ADD_ID_BOOKING, {
                     idUserBooking: newUserBooking._id,
@@ -129,7 +131,7 @@ export class BookingService {
                         };
                     }),
                 );
-                return [...listSoftBooking,...listTicket];
+                return [...listSoftBooking, ...listTicket];
             }
         } catch (err) {
             console.error(err);

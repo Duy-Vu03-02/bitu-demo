@@ -3,20 +3,25 @@ import { statusCode } from '@config/errors';
 import { Token } from '@config/token';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN, REFETCH_TOKEN } from '@config/enviroment';
-import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/token.user';
+import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/user.token';
 
 export class AuthMiddleware {
     public static requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const token = req.cookies[ACCESSTOKEN];
+        const authorization = req.headers.authorization;
+
+        if (!authorization) {
+            throw new Error('Authorization is missing');
+        }
+        const token = authorization.split(' ')[1];
         if (!token && !req.cookies[REFTECHTOKEN]) {
-            res.status(statusCode.AUTH_ACCOUNT_NOT_FOUND);
+            throw new Error('Token is missing');
         } else {
             try {
                 const verify = await Token.verifyToken(token, ACCESS_TOKEN);
                 if (verify) return next();
             } catch (err) {
                 if (err.message === 'TokenExpiredError') {
-                    const refetchTokenOld = req.cookies.refetchToken;
+                    const refetchTokenOld = req.headers.authorization.split(' ')[2];
                     if (!refetchTokenOld) return next(err);
                     const verifyRefetch = await Token.verifyToken(refetchTokenOld, REFETCH_TOKEN);
                     if (verifyRefetch) {

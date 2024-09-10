@@ -1,2 +1,5 @@
-GET
-http://localhost:8080/test
+POST http://localhost:8080/user/auth/token
+
+Content-Type: application/json
+
+Authorization: Bearer iuqwyeuiqwye

@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUserBooking } from './userBooking.interface';
-import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/state.ticket';
+import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/ticket.state';
 
 const UserBookingSchema: Schema<IUserBooking> = new Schema(
     {
