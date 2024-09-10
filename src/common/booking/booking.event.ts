@@ -1,31 +1,25 @@
 import { Queue, Job } from 'bull';
-import {
-    ADD_ID_BOOKING,
-    CANCEL_BOOKING,
-    CONFIRM_BOOKING,
-    CREATE_BOOKING,
-    DEL_BOOKING,
-} from '@common/contstant/booking.event';
+import { JOB_SEND_MAIL_CONFIRM as Job_Name } from '@config/job';
+import { v4 as uuid } from 'uuid';
+
 import eventbus from '@common/eventbus';
-import { IAddIdUserBooking, IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
+import {  IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
 import { BookingJob } from '@worker/booking/booking.job';
 import { UserModel } from '@common/user/user.model';
-import { SEND_MAIL } from '@common/contstant/mailer.event';
 import { TicketModel } from '@common/ticket/ticket.model';
+import { EventContant } from '@common/contstant/event.contant';
+import { QueueService } from '@common/queue/queue.service';
 
 export class BookingEvent {
     public static register = (): void => {
-        eventbus.on(CREATE_BOOKING, BookingEvent.handleCreateBooking);
-        eventbus.on(CONFIRM_BOOKING, BookingEvent.handleConfirmBooking);
-        eventbus.on(CANCEL_BOOKING, BookingEvent.handleCancelBooking);
-        eventbus.on(DEL_BOOKING, BookingEvent.handleDelBookingRedis);
-        eventbus.on(ADD_ID_BOOKING, BookingEvent.handleAddIdBooking);
+        eventbus.on(EventContant.CREATE_BOOKING, BookingEvent.handleCreateBooking);
+        eventbus.on(EventContant.CANCEL_BOOKING, BookingEvent.handleCancelBooking);
+        eventbus.on(EventContant.CONFIRM_BOOKING, BookingEvent.handleConfirmBooking);
     };
 
     public static handleCreateBooking = async (data: IBooking): Promise<void> => {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
-            // await RedisConnect.set(`${idUser}-${idTicket}`, idTicket, 300); // vo van
             await BookingJob.addJob({ idUser, idTicket });
         }
     };
@@ -33,37 +27,49 @@ export class BookingEvent {
     public static handleCancelBooking = async (data: IBooking): Promise<void> => {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
-            // await RedisConnect.del(`${idUser}-${idTicket}`);
             await BookingJob.delBooking(data as ICancelBooking);
         }
     };
 
-    public static handleConfirmBooking = async (data: IBooking): Promise<void> => {
-        const { idUser, idTicket } = data;
+    public static handleConfirmBooking = async (data: IConfirmBooking): Promise<void> => {
+        const { idUser, idTicket, idUserBooking } = data;
         if (idTicket && idUser) {
-            // await RedisConnect.del(`${idUser}-${idTicket}`);
             await BookingJob.delBooking(data as IConfirmBooking);
-        }
-    };
 
-    public static handleDelBookingRedis = async (data: IBooking): Promise<void> => {
-        await BookingJob.delBooking(data as IBooking);
-    };
-
-    public static handleAddIdBooking = async (data: IAddIdUserBooking): Promise<void> => {
-        const user = await UserModel.findByIdAndUpdate(data.idUser, {
-            flight: data.idUserBooking,
-        });
-        if (user.email) {
-            const ticket = await TicketModel.findById(data.idTicket);
-            if (ticket) {
-                eventbus.emit(SEND_MAIL, {
-                    email: user.email,
-                    from: ticket.from.name,
-                    to: ticket.to.name,
-                    timeStart: ticket.timeStart,
-                });
+            const user = await UserModel.findByIdAndUpdate(idUser, {
+                flight: idUserBooking,
+            });
+            if (user.email) {
+                const ticket = await TicketModel.findById(idTicket);
+                if (ticket) {
+                    const queue = await QueueService.getQueue(Job_Name);
+                    queue.add(
+                        { email: user.email, timeStart: ticket.timeStart, from: ticket.from, to: ticket.to },
+                        {
+                            jobId: user.email + '-' + uuid(),
+                            removeOnComplete: true,
+                            removeOnFail: true,
+                        },
+                    );
+                }
             }
         }
     };
+
+    // public static handleAddIdBooking = async (data: IAddIdUserBooking): Promise<void> => {
+    //     const user = await UserModel.findByIdAndUpdate(data.idUser, {
+    //         flight: data.idUserBooking,
+    //     });
+    //     if (user.email) {
+    //         const ticket = await TicketModel.findById(data.idTicket);
+    //         if (ticket) {
+    //             eventbus.emit(SEND_MAIL, {
+    //                 email: user.email,
+    //                 from: ticket.from.name,
+    //                 to: ticket.to.name,
+    //                 timeStart: ticket.timeStart,
+    //             });
+    //         }
+    //     }
+    // };
 }

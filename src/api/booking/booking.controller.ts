@@ -13,38 +13,38 @@ export class BookingController {
     public static bookingTicket = async (req: Request, res: Response): Promise<void> => {
         try {
             await BookingService.bookingTicket(req.body as IBooking);
-            res.sendJson()
+            res.sendJson();
         } catch (err) {
             res.sendJson({
                 status: statusCode.SERVER_ERROR,
                 message: err.message,
-            })
+            });
         }
     };
 
     public static confirmBooking = async (req: Request, res: Response): Promise<void> => {
         try {
             await BookingService.confirmBooking(req.body as IConfirmBooking);
-            res.sendJson( )
+            res.sendJson();
         } catch (err) {
             res.sendJson({
                 message: err.message,
 
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
 
     public static cancelBooking = async (req: Request, res: Response): Promise<void> => {
         try {
             await BookingService.cancelBooking(req.body as ICancelBooking);
-            res.sendJson( )
+            res.sendJson();
         } catch (err) {
             res.sendJson({
                 message: err.message,
 
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
 
@@ -56,8 +56,8 @@ export class BookingController {
             });
         } catch (err) {
             res.sendJson({
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
 }

@@ -21,22 +21,7 @@ export class TicketService {
             }
             return;
         } catch (err) {
-            console.error(err);
-        }
-    };
-
-    public static getTicketById = async (data: IGetTicket): Promise<ITicketResponse[]> => {
-        try {
-            const { idUser } = data;
-            if (idUser) {
-                const listTicket: ITicketResponse[] = await UserModel.findById(idUser);
-                if (listTicket) {
-                    return listTicket;
-                }
-            }
-            return;
-        } catch (err) {
-            console.error(err);
+            throw Error(err.message);
         }
     };
 }

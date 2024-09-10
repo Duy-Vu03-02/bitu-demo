@@ -9,9 +9,9 @@ import {
     IUserOTP,
 } from './user.interface';
 import { UserModel } from './user.model';
-import { FORGOT_PASSWORD } from '@common/contstant/user.event';
 import { QueueService } from '@common/queue/queue.service';
 import { JOB_FORGOT_PASSWORD } from '@config/job';
+import { EventContant } from '@common/contstant/event.contant';
 
 export class UserService {
     public static login = async (data: IUserLogin): Promise<IUserResponse> => {
@@ -54,7 +54,7 @@ export class UserService {
         try {
             const user = await UserModel.findOne({ email: data.email });
             if (user) {
-                eventbus.emit(FORGOT_PASSWORD, { email: user.email, ip: data.ip } as IUserForgorPassword);
+                eventbus.emit(EventContant.FORGOT_PASSWORD, { email: user.email, ip: data.ip } as IUserForgorPassword);
                 return true;
             }
         } catch (err) {

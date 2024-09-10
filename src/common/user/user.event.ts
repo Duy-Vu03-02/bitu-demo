@@ -1,15 +1,13 @@
-import { FORGOT_PASSWORD } from '@common/contstant/user.event';
 import eventbus from '@common/eventbus';
 import { IUserForgorPassword } from './user.interface';
 import { QueueService } from '@common/queue/queue.service';
 import { JOB_FORGOT_PASSWORD } from '@config/job';
 import { v4 as uuid } from 'uuid';
+import { EventContant } from '@common/contstant/event.contant';
 
 export class UserEvent {
-    private static delays: number = 1000 * 60 * 5;
-
     public static register = (): void => {
-        eventbus.on(FORGOT_PASSWORD, UserEvent.handleForgotPassword);
+        eventbus.on(EventContant.FORGOT_PASSWORD, UserEvent.handleForgotPassword);
     };
 
     public static handleForgotPassword = async (data: IUserForgorPassword) => {
@@ -27,7 +25,6 @@ export class UserEvent {
                 attempts: 3,
                 backoff: 1000,
                 removeOnFail: true,
-                // lifetime: 1000 * 60 *5,
             },
         );
     };

@@ -7,8 +7,13 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './router';
 
-express.response.sendJson = function (error_code: number = 0, status: number = statusCode.OK, message: string = 'OK', data: object) {
-    return this.json({ error_code,status, message, ...data });
+express.response.sendJson = function (
+    error_code: number = 0,
+    status: number = statusCode.OK,
+    message: string = 'OK',
+    data: object,
+) {
+    return this.json({ error_code, status, message, ...data });
 };
 
 export class ExpressServer {

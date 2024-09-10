@@ -20,14 +20,15 @@ export class UserController {
                 res.cookie(REFTECHTOKEN, refetchToken, {
                     maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
-                res.sendJson({ 
-                    data: user });
+                res.sendJson({
+                    data: user,
+                });
             }
         } catch (err) {
             res.sendJson({
                 message: err.message,
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
 
@@ -49,8 +50,8 @@ export class UserController {
         } catch (err) {
             res.sendJson({
                 message: err.message,
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
 

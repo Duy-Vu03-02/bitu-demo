@@ -8,14 +8,13 @@ export class TicketController {
         try {
             const listTicket = await TicketService.getAllTicket(req.body as IGetTicketByTime);
             res.sendJson({
-                data: listTicket
-            })
+                data: listTicket,
+            });
         } catch (err) {
             res.sendJson({
                 message: err.message,
-                status: statusCode.SERVER_ERROR
-            })
+                status: statusCode.SERVER_ERROR,
+            });
         }
     };
-
 }

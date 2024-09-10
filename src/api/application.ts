@@ -3,7 +3,6 @@ import { DatabaseAdapter } from '@common/infrastructure/database.adapter';
 import { PORT } from '@config/enviroment';
 import { TicketCron } from '@common/ticket/ticket.cron';
 import { TickerEvent } from '@common/ticket/event.ticket';
-import { BookingSendMail } from '@common/booking/booking.email-job';
 import { UserEvent } from '@common/user/user.event';
 import { ExpressServer } from '@api/server';
 import { RedisAdapter } from '@common/infrastructure/redis.adapter';
@@ -27,7 +26,6 @@ export class Application {
     public static registerEvent = () => {
         BookingEvent.register();
         TickerEvent.register();
-        BookingSendMail.register();
         UserEvent.register();
     };
 

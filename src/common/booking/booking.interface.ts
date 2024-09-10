@@ -4,7 +4,9 @@ export interface IBooking {
 }
 
 export interface IConfirmBooking {
+    idUserBooking: string;
     idUser: string;
+    timeStart: string;
     idTicket: string;
 }
 

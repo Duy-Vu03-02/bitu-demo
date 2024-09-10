@@ -1,27 +1,25 @@
-import { ADD_ID_BOOKING, CREATE_BOOKING, DEL_BOOKING } from '@common/contstant/booking.event';
 import {
     IBooking,
     IBookingIdUser,
     ICancelBooking,
     IConfirmBooking,
-    IConfirmSendMail,
     IResponseBookingUser,
 } from './booking.interface';
 import eventbus from '@common/eventbus';
 import { UserModel } from '@common/user/user.model';
 import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/ticket.state';
-import { AUTOMATIC_INCREASE, AUTOMATIC_REDUCTION } from '@common/contstant/ticket.event';
 import { TicketModel } from '@common/ticket/ticket.model';
 import { BookingJob } from '@worker/booking/booking.job';
 import { UserBookingModel } from '@common/userBooking/userBooking.model';
 import { IUserBooking } from '@common/userBooking/userBooking.interface';
+import { EventContant } from '@common/contstant/event.contant';
 
 export class BookingService {
     public static bookingTicket = async (data: IBooking): Promise<void> => {
         try {
             const { idUser, idTicket } = data;
             if (idUser && idTicket) {
-                eventbus.emit(CREATE_BOOKING, { idUser, idTicket });
+                eventbus.emit(EventContant.CREATE_BOOKING, { idUser, idTicket });
             }
         } catch (err) {
             console.error(err);
@@ -42,15 +40,11 @@ export class BookingService {
                     ],
                 });
 
-                eventbus.emit()
-
-                eventbus.emit(ADD_ID_BOOKING, {
+                eventbus.emit(EventContant.CONFIRM_BOOKING, {
                     idUserBooking: newUserBooking._id,
                     idUser: idUser,
                     idTicket,
                 });
-                eventbus.emit(DEL_BOOKING, { idUser, idTicket });
-                eventbus.emit(AUTOMATIC_REDUCTION, { idUser, idTicket });
             }
         } catch (err) {
             console.error(err);
@@ -72,9 +66,8 @@ export class BookingService {
                         },
                     },
                 );
-                eventbus.emit(AUTOMATIC_INCREASE, { idUser, idTicket });
+                eventbus.emit(EventContant.CANCEL_BOOKING, { idUser, idTicket });
             }
-            eventbus.emit(DEL_BOOKING, { idUser, idTicket });
         } catch (err) {
             console.error(err);
         }
