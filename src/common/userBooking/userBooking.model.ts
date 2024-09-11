@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
-import { IUserBooking } from './userBooking.interface';
+import { IUserBooking, IUserBookingReponse } from './userBooking.interface';
 import { TicketContant } from '@common/contstant/ticket.contant';
+import { transform } from 'typescript';
 
 const UserBookingSchema: Schema<IUserBooking> = new Schema(
     {
@@ -17,14 +18,19 @@ const UserBookingSchema: Schema<IUserBooking> = new Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            transform: (doc, ret) => {
-                ret.id = ret._id.toHexString();
-                delete ret._id;
-                delete ret._v;
-            },
-        },
+         
     },
 );
 
-export const UserBookingModel = mongoose.model<IUserBooking>('UserBookingModel', UserBookingSchema);
+UserBookingSchema.method({
+    transform() : IUserBookingReponse{
+        const tranformed : IUserBookingReponse = {
+            id : this._id.toHexString(),
+            idUser : this.idUser.toHexString(),
+            tickets: this.tickets,
+        }
+        return tranformed;
+    }
+})
+
+export const UserBookingModel = mongoose.model<IUserBooking>('UserBooking', UserBookingSchema);

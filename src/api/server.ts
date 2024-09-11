@@ -7,13 +7,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './router';
 
-express.response.sendJson = function (
-    error_code: number = 0,
-    status: number = statusCode.OK,
-    message: string = 'OK',
-    data: object,
-) {
-    return this.json({ error_code, status, message, ...data });
+express.response.sendJson = function (data: object) {
+    return this.json({ error_code: 0, message: 'OK', ...data });
 };
 
 export class ExpressServer {
@@ -25,6 +20,7 @@ export class ExpressServer {
 
         this.configMiddleware(server);
         this.useRouter(server);
+        // this.setupErrorHandlers(server)
         this.httpServer = this.listen(server, port);
         this.server = server;
         return this.server;
@@ -66,4 +62,15 @@ export class ExpressServer {
         console.log('SERVER PORT :: ', port);
         return app.listen(port);
     };
+
+    // private setupErrorHandlers(server: Express) {
+    //     // if error is not an instanceOf APIError, convert it.
+    //     server.use(ResponseMiddleware.converter);
+
+    //     // catch 404 and forward to error handler
+    //     server.use(ResponseMiddleware.notFound);
+
+    //     // error handler, send stacktrace only during development
+    //     server.use(ResponseMiddleware.handler);
+    // }
 }

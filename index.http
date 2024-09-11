@@ -1,6 +1,0 @@
-POST http://localhost:8080/user/auth/forgot-pass
-content-type: application/json
-
-{
-    "email":"vungovu00@gmail.com"
-}

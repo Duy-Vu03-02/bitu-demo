@@ -1,4 +1,4 @@
-import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/user.token';
+import { UserContant } from '@common/contstant/user.contant';
 import mongoose, { Schema } from 'mongoose';
 
 export interface IUserDataToken extends IUserResponse {
@@ -10,8 +10,8 @@ export interface IUserLogin {
 }
 
 export interface ITokenAuthen {
-    [ACCESSTOKEN]: string;
-    [REFTECHTOKEN]: string;
+    [UserContant.ACCESSTOKEN]: string;
+    [UserContant.REFTECHTOKEN]: string;
 }
 
 export interface IUserRegister {
@@ -34,6 +34,8 @@ export interface IUserData extends Document {
     password: string;
     username: string;
     flight: Schema.Types.ObjectId;
+
+    transform() : IUserResponse;
 }
 
 export interface IUserForgorPassword {
@@ -47,5 +49,3 @@ export interface IUserOTP {
     email?: string;
     ip: string;
 }
-
-export interface IUserResponseOTP {}

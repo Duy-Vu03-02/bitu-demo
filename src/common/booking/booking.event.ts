@@ -8,8 +8,6 @@ import { EventContant } from '@common/contstant/event.contant';
 import { QueueService } from '@common/queue/queue.service';
 import { JobContant } from '@common/contstant/job.contant';
 
-
-
 export class BookingEvent {
     private static delayJOb: number = 1000 * 60 * 5;
 
@@ -23,13 +21,16 @@ export class BookingEvent {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
-            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
-            await currentJob.add({idUser, idTicket}, {
-                delay: BookingEvent.delayJOb,
-                jobId: idJob,
-                removeOnComplete: true,
-                removeOnFail: true,
-            })
+            const idJob = BookingEvent.genderIdJob({ idUser, idTicket });
+            await currentJob.add(
+                { idUser, idTicket },
+                {
+                    delay: BookingEvent.delayJOb,
+                    jobId: idJob,
+                    removeOnComplete: true,
+                    removeOnFail: true,
+                },
+            );
         }
     };
 
@@ -37,29 +38,27 @@ export class BookingEvent {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
-            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
+            const idJob = BookingEvent.genderIdJob({ idUser, idTicket });
             const currentBooking = await currentJob.getJob(idJob);
 
-            if(currentBooking){
+            if (currentBooking) {
                 await currentBooking.remove();
             }
         }
     };
 
     public static handleConfirmBooking = async (data: IConfirmBooking): Promise<void> => {
-        const { idUser, idTicket, idUserBooking } = data;
+        const { idUser, idTicket } = data;
         if (idTicket && idUser) {
             const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
-            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
+            const idJob = BookingEvent.genderIdJob({ idUser, idTicket });
             const currentBooking = await currentJob.getJob(idJob);
 
-            if(currentBooking){
+            if (currentBooking) {
                 await currentBooking.remove();
             }
 
-            const user = await UserModel.findByIdAndUpdate(idUser, {
-                flight: idUserBooking,
-            });
+            const user = await UserModel.findById(idUser);
             if (user.email) {
                 const ticket = await TicketModel.findById(idTicket);
                 if (ticket) {
@@ -76,7 +75,6 @@ export class BookingEvent {
             }
         }
     };
-
 
     public static genderIdJob = (job: IBooking): string => {
         return job.idUser + '-' + job.idTicket;

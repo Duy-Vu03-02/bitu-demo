@@ -1,6 +1,6 @@
 import { IUserDataToken } from '@common/user/user.interface';
 import jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN, REFETCH_TOKEN } from './enviroment';
+import { ACCESSTOKEN_SECRET, REFETCHTOKEN_SECRET } from './enviroment';
 export interface IToken {
     accessToken: string;
     refetchToken: string;
@@ -10,10 +10,10 @@ export class Token {
     public static genderToken = async (payload: IUserDataToken): Promise<IToken> => {
         const { id } = payload;
         if (id) {
-            const accessToken = await jwt.sign({ id: payload.id }, ACCESS_TOKEN, {
+            const accessToken = await jwt.sign({ id: payload.id }, ACCESSTOKEN_SECRET, {
                 expiresIn: '1h',
             });
-            const refetchToken = await jwt.sign({ id: payload.id }, REFETCH_TOKEN, {
+            const refetchToken = await jwt.sign({ id: payload.id }, REFETCHTOKEN_SECRET, {
                 expiresIn: '30d',
             });
             return { accessToken, refetchToken };

@@ -1,4 +1,4 @@
-import  { Queue,Job, DoneCallback } from 'bull';
+import { Queue, Job, DoneCallback } from 'bull';
 import { QueueService } from '@common/queue/queue.service';
 import { JobContant } from '@common/contstant/job.contant';
 

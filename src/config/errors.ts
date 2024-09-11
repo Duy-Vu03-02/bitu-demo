@@ -1,6 +1,6 @@
 export enum statusCode {
-    // OK
-    OK = 200,
+    // VERIFY ERROR
+    VERIFY_FAILED = 1,
 
     // AUTH ERROR
     AUTH_ACCOUNT_EXISTS = 100,
@@ -16,5 +16,5 @@ export enum statusCode {
 
     // SERVER ERROR
     SERVER_ERROR = 500,
-    SERVER_AUTH_ERROR = 501,
+    SERVER_AUTH_ERROR = 501, // and not know why
 }

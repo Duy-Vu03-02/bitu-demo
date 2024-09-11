@@ -29,7 +29,7 @@ export class MailerConfirmBookingJob {
 
             const infor = await transporter.sendMail({
                 from: `Ngô Duy Vũ <${EMAIL_ACCOUNT}>`,
-                to: 'vungovu00@gmail.com',
+                to: job.data.email,
                 subject: 'XÁC NHẬN ĐẶT VÉ ✔',
                 text: 'XÁC NHẬN ĐẶT VÉ',
                 html: `

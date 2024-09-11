@@ -1,3 +1,4 @@
+import { statusCode } from '@config/errors';
 import { Queue } from 'bull';
 import eventbus from '@common/eventbus';
 import {
@@ -12,6 +13,7 @@ import { UserModel } from './user.model';
 import { QueueService } from '@common/queue/queue.service';
 import { EventContant } from '@common/contstant/event.contant';
 import { JobContant } from '@common/contstant/job.contant';
+import { APIError } from '@common/error/api.error';
 
 export class UserService {
     public static login = async (data: IUserLogin): Promise<IUserResponse> => {
@@ -21,16 +23,21 @@ export class UserService {
                 const user = await UserModel.findOne({ phone, password });
 
                 if (user) {
-                    return user.toJSON();
+                    return user.transform();
                 }
             }
-            return;
+
+            throw new APIError({
+                message: 'Login Faild',
+                status: statusCode.AUTH_ACCOUNT_NOT_FOUND,
+                errorCode: statusCode.AUTH_ACCOUNT_NOT_FOUND,
+            });
         } catch (err) {
-            console.error(err);
+            throw new Error(err);
         }
     };
 
-    public static register = async (data: IUserRegister) => {
+    public static register = async (data: IUserRegister): Promise<IUserResponse> => {
         try {
             const { phone, username, password, email } = data;
             if (phone && username && password) {
@@ -41,14 +48,18 @@ export class UserService {
                     email,
                 });
                 await newUser.save();
-                return newUser;
+                return newUser.transform();
             }
+
+            throw new APIError({
+                message: 'Register Faild',
+                status: statusCode.REQUEST_NOT_FOUND,
+                errorCode: statusCode.REQUEST_NOT_FOUND,
+            });
         } catch (err) {
-            console.error(err);
+            throw new Error(err);
         }
     };
-
-    public static loginByToken = async (data: ITokenAuthen) => {};
 
     public static forgotPassword = async (data: IUserForgorPassword): Promise<boolean> => {
         try {
@@ -57,8 +68,9 @@ export class UserService {
                 eventbus.emit(EventContant.FORGOT_PASSWORD, { email: user.email, ip: data.ip } as IUserForgorPassword);
                 return true;
             }
+            return false;
         } catch (err) {
-            console.error(err);
+            throw new Error(err);
         }
     };
 
@@ -72,7 +84,7 @@ export class UserService {
 
                 if (job && job.data) {
                     if (job.data.otp === otp) {
-                        const user = (await UserModel.findOne({ email })).toJSON();
+                        const user = (await UserModel.findOne({ email })).transform();
                         if (user) {
                             return user;
                         }
@@ -81,7 +93,7 @@ export class UserService {
             }
             return false;
         } catch (err) {
-            console.error(err);
+            throw new Error(err);
         }
     };
 }

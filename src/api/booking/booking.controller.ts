@@ -7,57 +7,50 @@ import {
 } from '@common/booking/booking.interface';
 import { BookingService } from '@common/booking/booking.service';
 import { statusCode } from '@config/errors';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 export class BookingController {
-    public static bookingTicket = async (req: Request, res: Response): Promise<void> => {
+    public static bookingTicket = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            await BookingService.bookingTicket(req.body as IBooking);
-            res.sendJson();
-        } catch (err) {
+            const booking = await BookingService.bookingTicket(req.body as IBooking);
             res.sendJson({
-                status: statusCode.SERVER_ERROR,
-                message: err.message,
+                data: booking,
             });
+        } catch (err) {
+            next(err);
         }
     };
 
-    public static confirmBooking = async (req: Request, res: Response): Promise<void> => {
+    public static confirmBooking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            await BookingService.confirmBooking(req.body as IConfirmBooking);
-            res.sendJson();
-        } catch (err) {
+            const booking = await BookingService.confirmBooking(req.body as IConfirmBooking);
             res.sendJson({
-                message: err.message,
-
-                status: statusCode.SERVER_ERROR,
+                data: booking,
             });
+        } catch (err) {
+            next(err);
         }
     };
 
-    public static cancelBooking = async (req: Request, res: Response): Promise<void> => {
+    public static cancelBooking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            await BookingService.cancelBooking(req.body as ICancelBooking);
-            res.sendJson();
-        } catch (err) {
+            const booking = await BookingService.cancelBooking(req.body as ICancelBooking);
             res.sendJson({
-                message: err.message,
-
-                status: statusCode.SERVER_ERROR,
+                data: booking,
             });
+        } catch (err) {
+            next(err);
         }
     };
 
-    public static allBookingByUser = async (req: Request, res: Response): Promise<any> => {
+    public static allBookingByUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
         try {
             const listBookingTicket = await BookingService.allBookingByUser(req.body as IBookingIdUser);
             res.sendJson({
                 data: listBookingTicket,
             });
         } catch (err) {
-            res.sendJson({
-                status: statusCode.SERVER_ERROR,
-            });
+            next(err);
         }
     };
 }

@@ -13,6 +13,7 @@ export interface IConfirmBooking {
 export interface ICancelBooking {
     idUser: string;
     idTicket: string;
+    idUserBooking: string;
 }
 
 export interface IBookingIdUser {
@@ -24,7 +25,7 @@ export interface IAllBookingUser {
 }
 
 export interface IResponseBookingUser {
-    _id: string;
+    id: string;
     timeStart: Date;
     from: {
         idLocation: string;
@@ -36,7 +37,6 @@ export interface IResponseBookingUser {
     };
     quantity: Number;
     price: Number;
-    id: string;
     state: string;
     payment: boolean;
     cancel: boolean;

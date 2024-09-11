@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import { IUserData } from './user.interface';
+import { IUserData, IUserResponse } from './user.interface';
+import { transform } from 'typescript';
 
 const UserSchema: Schema<IUserData> = new Schema(
     {
@@ -11,15 +12,20 @@ const UserSchema: Schema<IUserData> = new Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            transform: (doc, ret) => {
-                ret.id = ret._id.toHexString();
-                delete ret._id;
-                delete ret.__v;
-                delete ret.password;
-            },
-        },
+         
     },
 );
+
+UserSchema.method({
+    transform() : IUserResponse{
+        const transformed : IUserResponse =     {
+            id: this._id.toHexString(),
+            username:this.username,   
+            phone:this.phone,
+            flight:this.flight,
+        }
+        return transformed;
+    }
+})
 
 export const UserModel = mongoose.model<IUserData>('User', UserSchema);

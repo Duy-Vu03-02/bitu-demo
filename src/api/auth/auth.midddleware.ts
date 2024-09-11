@@ -2,43 +2,45 @@ import { NextFunction, Request, Response } from 'express';
 import { statusCode } from '@config/errors';
 import { Token } from '@config/token';
 import jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN, REFETCH_TOKEN } from '@config/enviroment';
+import { ACCESSTOKEN_SECRET, REFETCHTOKEN_SECRET } from '@config/enviroment';
 import { UserContant } from '@common/contstant/user.contant';
+import { APIError } from '@common/error/api.error';
 
 export class AuthMiddleware {
     public static requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const authorization = req.headers.authorization;
-        
-        if (!authorization) {
-            throw new Error('Authorization is missing');
-        }
-        const token = authorization.split(' ')[1];
-        if (!token && !req.cookies[UserContant.ACCESSTOKEN]) {
-            throw new Error('Token is missing');
-        } else {
-            try {
-                const verify = await Token.verifyToken(token, ACCESS_TOKEN);
-                if (verify) return next();
-            } catch (err) {
-                if (err.message === 'TokenExpiredError') {
-                    const refetchTokenOld = req.headers.authorization.split(' ')[2];
-                    if (!refetchTokenOld) return next(err);
-                    const verifyRefetch = await Token.verifyToken(refetchTokenOld, REFETCH_TOKEN);
-                    if (verifyRefetch) {
-                        const payload = await jwt.decode(refetchTokenOld);
-                        const { accessToken, refetchToken } = await Token.genderToken(payload);
-                        res.cookie(UserContant.ACCESSTOKEN, accessToken, {
-                            maxAge: 1000 * 60 * 60,
-                        });
-                        res.cookie(UserContant.REFTECHTOKEN, refetchToken, {
-                            maxAge: 1000 * 60 * 60 * 24 * 30,
-                        });
-                        return next();
+        if (authorization) {
+            const token = JSON.parse(authorization.split(' ')[1]);
+            if (token) {
+                try {
+                    const accesstoken  = token[UserContant.ACCESSTOKEN];
+                    const verify = await Token.verifyToken(accesstoken, ACCESSTOKEN_SECRET);
+                    if (verify) return next();
+                } catch (err) {
+                    if (err.message === 'TokenExpiredError') {
+                        if(token[UserContant.REFTECHTOKEN]){
+                            const verifyRefetch = await Token.verifyToken(token[UserContant.REFTECHTOKEN], REFETCHTOKEN_SECRET);
+                        if (verifyRefetch) {
+                            const payload = JSON.parse(atob(token[UserContant.REFTECHTOKEN].split('.')[1]));
+                            const { accessToken, refetchToken } = await Token.genderToken(payload);
+                            req[UserContant.ACCESSTOKEN] = accessToken;
+                            req[UserContant.REFTECHTOKEN] = refetchToken;
+                            return next();
+                        }
+                        }
+                    } else {
+                        return next(err);
                     }
-                } else {
-                    next(err);
                 }
             }
         }
+
+        return next(
+            new APIError({
+                message: 'Authorization is missing',
+                status: statusCode.AUTH_ACCOUNT_NOT_FOUND,
+                errorCode: statusCode.AUTH_ACCOUNT_NOT_FOUND,
+            }),
+        );
     };
 }

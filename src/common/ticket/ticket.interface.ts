@@ -1,3 +1,4 @@
+import { transform } from 'typescript';
 import mongoose, { Schema } from 'mongoose';
 
 export interface IGetTicket {
@@ -29,6 +30,7 @@ export interface ITicketResponse {
     };
     quantity: number;
     price: number;
+
 }
 
 export interface ITicket extends Document {
@@ -44,4 +46,6 @@ export interface ITicket extends Document {
     };
     quantity: Number;
     price: Number;
+
+    transform() : ITicketResponse;
 }

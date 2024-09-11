@@ -17,11 +17,11 @@ export class TicketService {
                     },
                 });
 
-                return listTicket.map((ticket) => ticket.toJSON());
+                return listTicket.map((ticket) => ticket.transform());
             }
-            return;
+            return [];
         } catch (err) {
-            throw Error(err.message);
+            return [];
         }
     };
 }
