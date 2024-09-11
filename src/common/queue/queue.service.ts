@@ -14,9 +14,6 @@ export class QueueService {
                 },
             });
 
-            // Lang nghe process moi autoremove dc
-            // queue.process((job) => {});
-
             queue.on('error', (error) => console.error(error));
             QueueService.queues.set(jobName, queue);
         }

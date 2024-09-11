@@ -1,13 +1,13 @@
 import { QueueService } from '@common/queue/queue.service';
 import { DoneCallback, Job, Queue } from 'bull';
-import { JOB_SEND_MAIL_CONFIRM as Job_Name } from '@config/job';
 import nodemailer, { Transporter } from 'nodemailer';
 import { EMAIL_ACCOUNT, EMAIL_PASSWORD } from '@config/enviroment';
 import { IConfirmSendMail } from '@common/booking/booking.interface';
+import { JobContant } from '@common/contstant/job.contant';
 
 export class MailerConfirmBookingJob {
     public static async register(): Promise<Queue<unknown>> {
-        const queue = await QueueService.getQueue(Job_Name);
+        const queue = await QueueService.getQueue(JobContant.JOB_SEND_MAIL_CONFIRM);
         queue.process(MailerConfirmBookingJob.handler);
 
         return queue;

@@ -1,14 +1,14 @@
-import { JOB_FORGOT_PASSWORD as JOB_NAME } from '@config/job';
 import { QueueService } from '@common/queue/queue.service';
 import { IUserForgorPassword } from '@common/user/user.interface';
 import { DoneCallback, Job } from 'bull';
 import nodemailer from 'nodemailer';
 import { Queue } from 'bull';
 import { EMAIL_ACCOUNT, EMAIL_PASSWORD } from '@config/enviroment';
+import { JobContant } from '@common/contstant/job.contant';
 
 export class MailerForgotPassword {
     public static async register(): Promise<Queue<unknown>> {
-        const queue = await QueueService.getQueue(JOB_NAME);
+        const queue = await QueueService.getQueue(JobContant.JOB_FORGOT_PASSWORD);
         await queue.process(MailerForgotPassword.handler);
 
         return queue;

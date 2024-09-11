@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IUserBooking } from './userBooking.interface';
-import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/ticket.state';
+import { TicketContant } from '@common/contstant/ticket.contant';
 
 const UserBookingSchema: Schema<IUserBooking> = new Schema(
     {
@@ -8,7 +8,10 @@ const UserBookingSchema: Schema<IUserBooking> = new Schema(
         tickets: [
             {
                 idTicket: { type: Schema.Types.ObjectId, ref: 'Ticket' },
-                state: { type: String, enum: [DA_HUY, DA_THANH_TOAN, CHUA_XAC_NHAN] },
+                state: {
+                    type: String,
+                    enum: [TicketContant.PAYMENTED, TicketContant.CANCELED, TicketContant.NOT_CONFIRM],
+                },
             },
         ],
     },

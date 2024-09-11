@@ -2,7 +2,7 @@ import { BookingEvent } from '@common/booking/booking.event';
 import { DatabaseAdapter } from '@common/infrastructure/database.adapter';
 import { PORT } from '@config/enviroment';
 import { TicketCron } from '@common/ticket/ticket.cron';
-import { TickerEvent } from '@common/ticket/event.ticket';
+import { TickerEvent } from '@common/ticket/ticket.event';
 import { UserEvent } from '@common/user/user.event';
 import { ExpressServer } from '@api/server';
 import { RedisAdapter } from '@common/infrastructure/redis.adapter';

@@ -3,7 +3,7 @@ import { BookingEvent } from '@common/booking/booking.event';
 import { DatabaseAdapter } from '../common/infrastructure/database.adapter';
 import { WorkerServer } from './server';
 import { RedisAdapter } from '@common/infrastructure/redis.adapter';
-import { TickerEvent } from '@common/ticket/event.ticket';
+import { TickerEvent } from '@common/ticket/ticket.event';
 import { UserEvent } from '@common/user/user.event';
 
 export class Application {

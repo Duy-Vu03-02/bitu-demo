@@ -1,16 +1,18 @@
 import { Queue, Job } from 'bull';
-import { JOB_SEND_MAIL_CONFIRM as Job_Name } from '@config/job';
 import { v4 as uuid } from 'uuid';
-
 import eventbus from '@common/eventbus';
-import {  IBooking, ICancelBooking, IConfirmBooking } from './booking.interface';
-import { BookingJob } from '@worker/booking/booking.job';
+import { IBooking, IConfirmBooking } from './booking.interface';
 import { UserModel } from '@common/user/user.model';
 import { TicketModel } from '@common/ticket/ticket.model';
 import { EventContant } from '@common/contstant/event.contant';
 import { QueueService } from '@common/queue/queue.service';
+import { JobContant } from '@common/contstant/job.contant';
+
+
 
 export class BookingEvent {
+    private static delayJOb: number = 1000 * 60 * 5;
+
     public static register = (): void => {
         eventbus.on(EventContant.CREATE_BOOKING, BookingEvent.handleCreateBooking);
         eventbus.on(EventContant.CANCEL_BOOKING, BookingEvent.handleCancelBooking);
@@ -20,21 +22,40 @@ export class BookingEvent {
     public static handleCreateBooking = async (data: IBooking): Promise<void> => {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
-            await BookingJob.addJob({ idUser, idTicket });
+            const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
+            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
+            await currentJob.add({idUser, idTicket}, {
+                delay: BookingEvent.delayJOb,
+                jobId: idJob,
+                removeOnComplete: true,
+                removeOnFail: true,
+            })
         }
     };
 
     public static handleCancelBooking = async (data: IBooking): Promise<void> => {
         const { idUser, idTicket } = data;
         if (idTicket && idUser) {
-            await BookingJob.delBooking(data as ICancelBooking);
+            const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
+            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
+            const currentBooking = await currentJob.getJob(idJob);
+
+            if(currentBooking){
+                await currentBooking.remove();
+            }
         }
     };
 
     public static handleConfirmBooking = async (data: IConfirmBooking): Promise<void> => {
         const { idUser, idTicket, idUserBooking } = data;
         if (idTicket && idUser) {
-            await BookingJob.delBooking(data as IConfirmBooking);
+            const currentJob = await QueueService.getQueue(JobContant.JOB_BOOKING);
+            const idJob = BookingEvent.genderIdJob({idUser, idTicket});
+            const currentBooking = await currentJob.getJob(idJob);
+
+            if(currentBooking){
+                await currentBooking.remove();
+            }
 
             const user = await UserModel.findByIdAndUpdate(idUser, {
                 flight: idUserBooking,
@@ -42,7 +63,7 @@ export class BookingEvent {
             if (user.email) {
                 const ticket = await TicketModel.findById(idTicket);
                 if (ticket) {
-                    const queue = await QueueService.getQueue(Job_Name);
+                    const queue = await QueueService.getQueue(JobContant.JOB_SEND_MAIL_CONFIRM);
                     queue.add(
                         { email: user.email, timeStart: ticket.timeStart, from: ticket.from, to: ticket.to },
                         {
@@ -56,20 +77,8 @@ export class BookingEvent {
         }
     };
 
-    // public static handleAddIdBooking = async (data: IAddIdUserBooking): Promise<void> => {
-    //     const user = await UserModel.findByIdAndUpdate(data.idUser, {
-    //         flight: data.idUserBooking,
-    //     });
-    //     if (user.email) {
-    //         const ticket = await TicketModel.findById(data.idTicket);
-    //         if (ticket) {
-    //             eventbus.emit(SEND_MAIL, {
-    //                 email: user.email,
-    //                 from: ticket.from.name,
-    //                 to: ticket.to.name,
-    //                 timeStart: ticket.timeStart,
-    //             });
-    //         }
-    //     }
-    // };
+
+    public static genderIdJob = (job: IBooking): string => {
+        return job.idUser + '-' + job.idTicket;
+    };
 }

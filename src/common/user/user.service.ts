@@ -10,8 +10,8 @@ import {
 } from './user.interface';
 import { UserModel } from './user.model';
 import { QueueService } from '@common/queue/queue.service';
-import { JOB_FORGOT_PASSWORD } from '@config/job';
 import { EventContant } from '@common/contstant/event.contant';
+import { JobContant } from '@common/contstant/job.contant';
 
 export class UserService {
     public static login = async (data: IUserLogin): Promise<IUserResponse> => {
@@ -66,7 +66,7 @@ export class UserService {
         try {
             const { otp, email, ip } = data;
             if (otp && ip && email) {
-                const queue = await QueueService.getQueue(JOB_FORGOT_PASSWORD);
+                const queue = await QueueService.getQueue(JobContant.JOB_FORGOT_PASSWORD);
                 const idJob = email + '-' + ip;
                 const job = await queue.getJob(idJob);
 

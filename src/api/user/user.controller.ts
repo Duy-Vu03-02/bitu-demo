@@ -1,3 +1,4 @@
+import { UserContant } from './../../common/contstant/user.contant';
 import { UserModel } from '@common/user/user.model';
 import { IUserRegister, IUserLogin, IUserForgorPassword, IUserOTP } from '@common/user/user.interface';
 import { UserService } from '@common/user/user.service';
@@ -5,7 +6,6 @@ import { Response, Request } from 'express';
 import { Token } from '@config/token';
 import { IUserDataToken } from '@common/user/user.interface';
 import { statusCode } from '@config/errors';
-import { ACCESSTOKEN, REFTECHTOKEN } from '@common/contstant/user.token';
 import { ACCESS_TOKEN, REFETCH_TOKEN } from '@config/enviroment';
 
 export class UserController {
@@ -14,10 +14,10 @@ export class UserController {
             const user = await UserService.login(req.body as IUserLogin);
             if (user) {
                 const { accessToken, refetchToken } = await Token.genderToken(user as IUserDataToken);
-                res.cookie(ACCESSTOKEN, accessToken, {
+                res.cookie(UserContant.ACCESSTOKEN, accessToken, {
                     maxAge: 1000 * 60 * 60,
                 });
-                res.cookie(REFTECHTOKEN, refetchToken, {
+                res.cookie(UserContant.REFTECHTOKEN, refetchToken, {
                     maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
                 res.sendJson({
@@ -37,10 +37,10 @@ export class UserController {
             const newUser = await UserService.register(req.body as IUserRegister);
             if (newUser) {
                 const { accessToken, refetchToken } = await Token.genderToken(newUser.toJSON() as IUserDataToken);
-                res.cookie(ACCESSTOKEN, accessToken, {
+                res.cookie(UserContant.ACCESSTOKEN, accessToken, {
                     maxAge: 1000 * 60 * 60,
                 });
-                res.cookie(REFTECHTOKEN, refetchToken, {
+                res.cookie(UserContant.REFTECHTOKEN, refetchToken, {
                     maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
                 res.sendJson({
@@ -58,7 +58,7 @@ export class UserController {
     public static loginByToken = async (req: Request, res: Response): Promise<void> => {
         try {
             const authorization = req.headers.authorization;
-
+            console.log(authorization)
             if (!authorization) {
                 res.sendJson({
                     error_code: statusCode.AUTH_ACCOUNT_NOT_FOUND,
@@ -66,7 +66,7 @@ export class UserController {
                 });
             }
             const token = authorization.split(' ')[1];
-            if (!token && !req.cookies[REFTECHTOKEN]) {
+            if (!token && !req.cookies[UserContant.ACCESSTOKEN]) {
                 res.sendJson({
                     error_code: statusCode.AUTH_ACCOUNT_NOT_FOUND,
                     messgae: 'Authorization is missing',
@@ -101,10 +101,10 @@ export class UserController {
                         if (verifyRefetch) {
                             const payload = JSON.parse(atob(refetchTokenOld.split('.')[1]));
                             const { accessToken, refetchToken } = await Token.genderToken(payload);
-                            res.cookie(ACCESSTOKEN, accessToken, {
+                            res.cookie(UserContant.ACCESSTOKEN, accessToken, {
                                 maxAge: 1000 * 60 * 60,
                             });
-                            res.cookie(REFTECHTOKEN, refetchToken, {
+                            res.cookie(UserContant.REFTECHTOKEN, refetchToken, {
                                 maxAge: 1000 * 60 * 60 * 24 * 30,
                             });
                             const { id } = payload;
@@ -137,14 +137,14 @@ export class UserController {
     public static logout = async (req: Request, res: Response) => {
         try {
             res.cookie(
-                ACCESSTOKEN,
+                UserContant.ACCESSTOKEN,
                 {},
                 {
                     maxAge: 0,
                 },
             );
             res.cookie(
-                REFTECHTOKEN,
+                UserContant.REFTECHTOKEN,
                 {},
                 {
                     maxAge: 0,
@@ -181,10 +181,10 @@ export class UserController {
 
             if (userOTP) {
                 const { accessToken, refetchToken } = await Token.genderToken(userOTP as IUserDataToken);
-                res.cookie(ACCESSTOKEN, accessToken, {
+                res.cookie(UserContant.ACCESSTOKEN, accessToken, {
                     maxAge: 1000 * 60 * 60,
                 });
-                res.cookie(REFTECHTOKEN, refetchToken, {
+                res.cookie(UserContant.REFTECHTOKEN, refetchToken, {
                     maxAge: 1000 * 60 * 60 * 24 * 30,
                 });
                 res.status(statusCode.OK).json(userOTP);

@@ -1,18 +1,15 @@
-import {
-    IBooking,
-    IBookingIdUser,
-    ICancelBooking,
-    IConfirmBooking,
-    IResponseBookingUser,
-} from './booking.interface';
+import { IBooking, IBookingIdUser, ICancelBooking, IConfirmBooking, IResponseBookingUser } from './booking.interface';
 import eventbus from '@common/eventbus';
 import { UserModel } from '@common/user/user.model';
-import { CHUA_XAC_NHAN, DA_HUY, DA_THANH_TOAN } from '@common/contstant/ticket.state';
+import { TicketContant } from '@common/contstant/ticket.contant';
 import { TicketModel } from '@common/ticket/ticket.model';
 import { BookingJob } from '@worker/booking/booking.job';
 import { UserBookingModel } from '@common/userBooking/userBooking.model';
 import { IUserBooking } from '@common/userBooking/userBooking.interface';
 import { EventContant } from '@common/contstant/event.contant';
+import { BookingEvent } from './booking.event';
+import { QueueService } from '@common/queue/queue.service';
+import { JobContant } from '@common/contstant/job.contant';
 
 export class BookingService {
     public static bookingTicket = async (data: IBooking): Promise<void> => {
@@ -35,7 +32,7 @@ export class BookingService {
                     tickets: [
                         {
                             idTicket,
-                            state: DA_THANH_TOAN,
+                            state: TicketContant.PAYMENTED,
                         },
                     ],
                 });
@@ -62,7 +59,7 @@ export class BookingService {
                     },
                     {
                         $set: {
-                            'flight.$.state': DA_HUY,
+                            'flight.$.state': TicketContant.CANCELED,
                         },
                     },
                 );
@@ -100,7 +97,7 @@ export class BookingService {
                                         id: ticket['_doc']['_id'].toHexString(),
                                         state: item.state,
                                         payment: false,
-                                        cancel: item.state === DA_THANH_TOAN,
+                                        cancel: item.state === TicketContant.PAYMENTED,
                                     };
                                 }
                             }),
@@ -109,7 +106,7 @@ export class BookingService {
                 }
 
                 // Get trong redis
-                const listSoft = await BookingJob.getJobByIdUser(data as IBookingIdUser);
+                const listSoft = await BookingService.getJobByIdUser(data as IBookingIdUser);
                 if (listSoft.length <= 0) {
                     return listTicket;
                 }
@@ -118,7 +115,7 @@ export class BookingService {
                     listSoftId.map(async (item) => {
                         return {
                             ...(await TicketModel.findById(item)).toJSON(),
-                            state: CHUA_XAC_NHAN,
+                            state: TicketContant.NOT_CONFIRM,
                             payment: true,
                             cancel: true,
                         };
@@ -129,5 +126,17 @@ export class BookingService {
         } catch (err) {
             console.error(err);
         }
+    };
+
+    public static getJobByIdUser = async (job: IBookingIdUser): Promise<IBooking[]> => {
+        const queuedJobs = await (await QueueService.getQueue(JobContant.JOB_BOOKING)).getJobs(['delayed', 'paused', 'waiting', 'active']);
+        const listJobs = await Promise.all(
+            queuedJobs.map((item) => {
+                if (item.id.toString().includes(job.idUser)) {
+                    return item.data;
+                }
+            }),
+        );
+        return listJobs;
     };
 }
