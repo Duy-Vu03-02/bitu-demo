@@ -15,6 +15,7 @@ export interface IAutoReduction {
 
 export interface IAutoIncrease {
     idTicket: string;
+    flagIncrease: boolean;
 }
 
 export interface ITicketResponse {
@@ -30,7 +31,6 @@ export interface ITicketResponse {
     };
     quantity: number;
     price: number;
-
 }
 
 export interface ITicket extends Document {
@@ -47,5 +47,5 @@ export interface ITicket extends Document {
     quantity: Number;
     price: Number;
 
-    transform() : ITicketResponse;
+    transform(): ITicketResponse;
 }

@@ -33,7 +33,7 @@ export class UserService {
                 errorCode: statusCode.AUTH_ACCOUNT_NOT_FOUND,
             });
         } catch (err) {
-            throw new Error(err);
+            throw err;
         }
     };
 
@@ -41,14 +41,20 @@ export class UserService {
         try {
             const { phone, username, password, email } = data;
             if (phone && username && password) {
-                const newUser = await UserModel.create({
-                    phone,
-                    username,
-                    password,
-                    email,
+                const user = await UserModel.findOne({
+                    $or: [{ phone }, { email }],
                 });
-                await newUser.save();
-                return newUser.transform();
+
+                if (!user) {
+                    const newUser = await UserModel.create({
+                        phone,
+                        username,
+                        password,
+                        email,
+                    });
+                    await newUser.save();
+                    return newUser.transform();
+                }
             }
 
             throw new APIError({
@@ -57,7 +63,7 @@ export class UserService {
                 errorCode: statusCode.REQUEST_NOT_FOUND,
             });
         } catch (err) {
-            throw new Error(err);
+            throw err;
         }
     };
 
@@ -70,7 +76,7 @@ export class UserService {
             }
             return false;
         } catch (err) {
-            throw new Error(err);
+            throw err;
         }
     };
 
@@ -93,7 +99,7 @@ export class UserService {
             }
             return false;
         } catch (err) {
-            throw new Error(err);
+            throw err;
         }
     };
 }

@@ -18,28 +18,27 @@ const TicketSchema = new Schema(
     },
     {
         timestamps: true,
-       
     },
 );
 
 TicketSchema.method({
-    transform() : ITicketResponse {
-        const transformed : ITicketResponse = {
+    transform(): ITicketResponse {
+        const transformed: ITicketResponse = {
             id: this._id.toHexString(),
             timeStart: this.timeStart,
-        from: {
-            idLocation: this.from.idLocation.toHexString(),
-            name: this.from.name,
-        },
-        to:  {
-            idLocation: this.to.idLocation.toHexString(),
-            name: this.to.name,
-        },
-        quantity:this.quantity,
-        price: this.price,
-        }
+            from: {
+                idLocation: this.from.idLocation.toHexString(),
+                name: this.from.name,
+            },
+            to: {
+                idLocation: this.to.idLocation.toHexString(),
+                name: this.to.name,
+            },
+            quantity: this.quantity,
+            price: this.price,
+        };
         return transformed;
-    }
-})
+    },
+});
 
 export const TicketModel = mongoose.model<ITicket>('Ticket', TicketSchema);

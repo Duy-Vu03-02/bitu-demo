@@ -13,7 +13,7 @@ export interface IConfirmBooking {
 export interface ICancelBooking {
     idUser: string;
     idTicket: string;
-    idUserBooking: string;
+    idTicketUserBooking: string;
 }
 
 export interface IBookingIdUser {

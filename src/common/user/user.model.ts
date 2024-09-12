@@ -12,20 +12,19 @@ const UserSchema: Schema<IUserData> = new Schema(
     },
     {
         timestamps: true,
-         
     },
 );
 
 UserSchema.method({
-    transform() : IUserResponse{
-        const transformed : IUserResponse =     {
+    transform(): IUserResponse {
+        const transformed: IUserResponse = {
             id: this._id.toHexString(),
-            username:this.username,   
-            phone:this.phone,
-            flight:this.flight,
-        }
+            username: this.username,
+            phone: this.phone,
+            flight: this.flight,
+        };
         return transformed;
-    }
-})
+    },
+});
 
 export const UserModel = mongoose.model<IUserData>('User', UserSchema);

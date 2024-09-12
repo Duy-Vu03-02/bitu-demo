@@ -66,7 +66,7 @@ export class UserController {
                 const token = JSON.parse(authorization.split(' ')[1]);
                 if (token) {
                     try {
-                        const accesstoken  = token[UserContant.ACCESSTOKEN];
+                        const accesstoken = token[UserContant.ACCESSTOKEN];
                         const verify = await Token.verifyToken(accesstoken, ACCESSTOKEN_SECRET);
                         if (verify) {
                             const payload = JSON.parse(atob(accesstoken.split('.')[1]));
@@ -82,23 +82,26 @@ export class UserController {
                         }
                     } catch (err) {
                         if (err.message === 'TokenExpiredError') {
-                            if(token[UserContant.REFTECHTOKEN]){
-                                const verifyRefetch = await Token.verifyToken(token[UserContant.REFTECHTOKEN], REFETCHTOKEN_SECRET);
-                            if (verifyRefetch) {
-                                const payload = JSON.parse(atob(token[UserContant.REFTECHTOKEN].split('.')[1]));
-                                const { accessToken, refetchToken } = await Token.genderToken(payload);
-                                const { id } = payload;
-                                if (id) {
-                                    const user = await UserModel.findById(id);
-                                    if (user) {
-                                        return res.sendJson({
-                                            data: user,
-                                            [UserContant.ACCESSTOKEN]: accessToken,
-                                            [UserContant.REFTECHTOKEN]: refetchToken,
-                                        });
+                            if (token[UserContant.REFTECHTOKEN]) {
+                                const verifyRefetch = await Token.verifyToken(
+                                    token[UserContant.REFTECHTOKEN],
+                                    REFETCHTOKEN_SECRET,
+                                );
+                                if (verifyRefetch) {
+                                    const payload = JSON.parse(atob(token[UserContant.REFTECHTOKEN].split('.')[1]));
+                                    const { accessToken, refetchToken } = await Token.genderToken(payload);
+                                    const { id } = payload;
+                                    if (id) {
+                                        const user = await UserModel.findById(id);
+                                        if (user) {
+                                            return res.sendJson({
+                                                data: user,
+                                                [UserContant.ACCESSTOKEN]: accessToken,
+                                                [UserContant.REFTECHTOKEN]: refetchToken,
+                                            });
+                                        }
                                     }
                                 }
-                            }
                             }
                         }
                     }

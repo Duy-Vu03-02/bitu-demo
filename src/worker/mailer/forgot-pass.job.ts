@@ -10,7 +10,6 @@ export class MailerForgotPassword {
     public static async register(): Promise<Queue<unknown>> {
         const queue = await QueueService.getQueue(JobContant.JOB_FORGOT_PASSWORD);
         await queue.process(MailerForgotPassword.handler);
-
         return queue;
     }
 

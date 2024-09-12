@@ -18,19 +18,18 @@ const UserBookingSchema: Schema<IUserBooking> = new Schema(
     },
     {
         timestamps: true,
-         
     },
 );
 
 UserBookingSchema.method({
-    transform() : IUserBookingReponse{
-        const tranformed : IUserBookingReponse = {
-            id : this._id.toHexString(),
-            idUser : this.idUser.toHexString(),
+    transform(): IUserBookingReponse {
+        const tranformed: IUserBookingReponse = {
+            id: this._id.toHexString(),
+            idUser: this.idUser.toHexString(),
             tickets: this.tickets,
-        }
+        };
         return tranformed;
-    }
-})
+    },
+});
 
 export const UserBookingModel = mongoose.model<IUserBooking>('UserBooking', UserBookingSchema);

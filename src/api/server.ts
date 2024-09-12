@@ -1,4 +1,3 @@
-import { statusCode } from '@config/errors';
 import express, { Express } from 'express';
 import { Server } from 'http';
 import helmet from 'helmet';
@@ -6,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import routes from './router';
+import { ResponseMiddleware } from './response.middleware';
 
 express.response.sendJson = function (data: object) {
     return this.json({ error_code: 0, message: 'OK', ...data });
@@ -13,33 +13,35 @@ express.response.sendJson = function (data: object) {
 
 export class ExpressServer {
     private server?: Express;
-    private httpServer: Server; //close server
+    private httpServer: Server; 
 
     public setUp = function async(port: number): Promise<Express> {
         const server = express();
 
         this.configMiddleware(server);
         this.useRouter(server);
-        // this.setupErrorHandlers(server)
+        this.setupErrorHandlers(server)
+
         this.httpServer = this.listen(server, port);
         this.server = server;
         return this.server;
     };
 
-    public useRouter = (app: Express) => {
-        app.use(routes);
+    public useRouter = (server: Express) => {
+        server.use(routes);
     };
 
-    public configMiddleware = (app: Express) => {
-        app.use(
+    public configMiddleware = (server: Express) => {
+        server.use(
             cors({
                 origin: 'http://localhost:3000',
                 credentials: true,
             }),
         );
-        app.use(helmet());
-        app.use(cookieParser());
-        app.use(bodyParser.json());
+        server.use(helmet());
+        server.use(cookieParser());
+        server.use(express.json());
+        server.use(express.urlencoded({ extended: true }));
     };
 
     public async kill(): Promise<void> {
@@ -58,19 +60,12 @@ export class ExpressServer {
         });
     }
 
-    public listen = (app: Express, port: number): Server => {
+    public listen = (server: Express, port: number): Server => {
         console.log('SERVER PORT :: ', port);
-        return app.listen(port);
+        return server.listen(port);
     };
 
-    // private setupErrorHandlers(server: Express) {
-    //     // if error is not an instanceOf APIError, convert it.
-    //     server.use(ResponseMiddleware.converter);
-
-    //     // catch 404 and forward to error handler
-    //     server.use(ResponseMiddleware.notFound);
-
-    //     // error handler, send stacktrace only during development
-    //     server.use(ResponseMiddleware.handler);
-    // }
+    private setupErrorHandlers(server: Express) {
+        server.use(ResponseMiddleware.handler);
+    }
 }

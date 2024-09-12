@@ -24,8 +24,8 @@ export class TickerEvent {
 
     public static handleIncrease = async (data: IAutoIncrease): Promise<void> => {
         try {
-            const { idTicket } = data;
-            if (idTicket) {
+            const { idTicket, flagIncrease } = data;
+            if (idTicket && flagIncrease) {
                 await TicketModel.findByIdAndUpdate(idTicket, {
                     $inc: { quantity: 1 },
                 });

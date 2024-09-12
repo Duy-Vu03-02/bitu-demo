@@ -10,10 +10,10 @@ export interface IUserBooking extends Document {
         },
     ];
 
-    transform() : IUserBookingReponse;
+    transform(): IUserBookingReponse;
 }
 
-export interface IUserBookingReponse    {
+export interface IUserBookingReponse {
     id: string;
     idUser: string;
     tickets: [

@@ -7,6 +7,7 @@ import { UserEvent } from '@common/user/user.event';
 import { ExpressServer } from '@api/server';
 import { RedisAdapter } from '@common/infrastructure/redis.adapter';
 
+
 export class Application {
     public static createApplication = async (): Promise<ExpressServer> => {
         await DatabaseAdapter.connection();

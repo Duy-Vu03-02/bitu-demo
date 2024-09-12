@@ -1,3 +1,4 @@
+import { ErrorCode } from './../../../../demo-multiple-entrypoint-backend/src/config/errors';
 import {
     IAllBookingUser,
     IBooking,
@@ -6,7 +7,6 @@ import {
     IConfirmBooking,
 } from '@common/booking/booking.interface';
 import { BookingService } from '@common/booking/booking.service';
-import { statusCode } from '@config/errors';
 import { NextFunction, Request, Response } from 'express';
 
 export class BookingController {
@@ -34,6 +34,7 @@ export class BookingController {
 
     public static cancelBooking = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
+            console.log(req.body);
             const booking = await BookingService.cancelBooking(req.body as ICancelBooking);
             res.sendJson({
                 data: booking,

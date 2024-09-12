@@ -13,3 +13,4 @@ export const REFETCHTOKEN_SECRET: string = process.env.REFETCH_TOKEN;
 export const REDIS_URL: string = process.env.REDIS_URI;
 export const EMAIL_ACCOUNT: string = process.env.MAILER_ACCOUNT;
 export const EMAIL_PASSWORD: string = process.env.MAILER_PASSWORD;
+export const NODE_ENV: string = process.env.NODE_ENV;

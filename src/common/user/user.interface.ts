@@ -35,7 +35,7 @@ export interface IUserData extends Document {
     username: string;
     flight: Schema.Types.ObjectId;
 
-    transform() : IUserResponse;
+    transform(): IUserResponse;
 }
 
 export interface IUserForgorPassword {
