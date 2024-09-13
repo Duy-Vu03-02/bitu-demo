@@ -5,7 +5,7 @@ import { NODE_ENV } from "@config/enviroment";
 
 
 export class ResponseMiddleware{
-    public static handler (err: APIError, req: Request, res: Response, next: NextFunction) : void{
+    public static handler (err: APIError, req: Request, res: Response) : void{
         const { status = httpStatus.INTERNAL_SERVER_ERROR, errorCode = 1 } = err;
         const response = {
             error_code: errorCode,
